@@ -1,0 +1,166 @@
+x-devices: &devices
+    devices:
+        - /dev/kfd
+        - /dev/dri
+    group_add:
+        - video
+x-defaults: &defaults
+    security_opt:
+        - seccomp:unconfined
+    ipc: "host"
+    shm_size: "8G"
+    volumes:
+      - /data2/hf_home:/root/.cache/huggingface
+    environment:
+      #HIP_FORCE_DEV_KERNARG: 1
+      NCCL_MIN_NCHANNELS: 112      
+      #VLLM_USE_ROCM_CUSTOM_PAGED_ATTN: 1
+      VLLM_USE_TRITON_FLASH_ATTN: 0
+      #VLLM_INSTALL_PUNICA_KERNELS: 1
+      #VLLM_TUNE_GEMM: 0
+      #VLLM_WORKER_MULTIPROC_METHOD: "spawn"
+      TRUST_REMOTE_CODE: "true"
+      VLLM_USE_V1: 0
+      VLLM_USE_AITER: 1
+
+services:
+  proxy:
+    image: litellm/litellm:latest
+    network_mode: host
+    command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
+    restart: on-failure      
+    environment:
+      - OPENAI_API_KEY="sk-1234"
+    volumes:
+      - ./vllm/models.yaml:/app/config.yaml
+
+  vllm-model0:
+    <<: [*defaults, *devices]  
+    image: $IMAGE
+    container_name: vllm-model0
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8000
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "0"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s      
+  vllm-model1:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model1
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8001
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "1"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model2:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model2
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8002
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "2"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s     
+
+  vllm-model3:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model3
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8003
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "3"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model4:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model4
+    command: python -m vllm.entrypoints.openai.api_server -tp 2 --model Qwen/Qwen3-8B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8004
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "4,5"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model5:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model5
+    command: python -m vllm.entrypoints.openai.api_server -tp 2 --model Qwen/Qwen3-8B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8005
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "6,7"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model6:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model6
+    command: python -m vllm.entrypoints.openai.api_server -tp 4 --model Qwen/Qwen3-14B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8006
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "8,9,10,11"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model7:
+    <<: [*defaults, *devices]
+    image: $IMAGE
+    container_name: vllm-model7
+    command: python -m vllm.entrypoints.openai.api_server -tp 4 --model Qwen/Qwen3-14B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8007
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "12,13,14,15"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Trivia Load Generator</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.5; padding: 20px; max-width: 800px; margin: auto; background-color: #f9f9f9;}
+        #log { background-color: #fff; border: 1px solid #ddd; padding: 15px; height: 50vh; overflow-y: scroll; white-space: pre-wrap; font-family: monospace; font-size: 0.9em; border-radius: 4px; margin-top: 15px;}
+        button { padding: 10px 15px; font-size: 1em; cursor: pointer; margin-right: 10px; border: none; border-radius: 4px; color: white;}
+        #startButton { background-color: #28a745; }
+        #startButton:disabled { background-color: #aaa; }
+        #stopButton { background-color: #dc3545; }
+        #stopButton:disabled { background-color: #aaa; }
+        h1, h2 { text-align: center; color: #333;}
+        p { color: #555; text-align: center; }
+        .button-container { text-align: center; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>LLM Trivia Load Generator</h1>
+    <p>Click "Start Trivia" to begin a conversation between LLMs configured via LiteLLM.</p>
+    <div class="button-container">
+        <button id="startButton">Start Trivia</button>
+        <button id="stopButton">Stop Trivia</button>
+    </div>
+    <h2>Conversation Log</h2>
+    <pre id="log">Log will appear here...</pre>
+
+    <script>
+        const logElement = document.getElementById('log');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        let intervalId = null;
+        let isRunning = false;
+
+        // Function to fetch and update the log
+        async function updateLog() {
+            try {
+                // Use absolute path from root, which Nginx will proxy
+                const response = await fetch('/api/loadgen/log'); 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const logData = await response.json();
+                logElement.textContent = logData.join('\n');
+                // Scroll to the bottom only if the user hasn't scrolled up
+                if (logElement.scrollHeight - logElement.scrollTop <= logElement.clientHeight + 50) {
+                     logElement.scrollTop = logElement.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error fetching log:', error);
+                logElement.textContent += '\n\n*** Error fetching log. Polling stopped. Check console. ***';
+                stopPolling(); // Stop polling on error
+            }
+        }
+
+        function stopPolling() {
+             if (intervalId) {
+                 clearInterval(intervalId);
+                 intervalId = null;
+                 console.log("Log polling stopped.");
+             }
+             isRunning = false;
+             startButton.disabled = false;
+             stopButton.disabled = true;
+        }
+
+        // Event listener for the start button
+        startButton.addEventListener('click', async () => {
+            startButton.disabled = true; // Disable immediately
+            stopButton.disabled = false;
+            logElement.textContent = 'Starting trivia... Please wait.';
+            isRunning = true;
+            try {
+                // Use absolute path from root
+                const response = await fetch('/api/loadgen/start', { method: 'POST' });
+                if (!response.ok) {
+                   // Try to get error message from response body
+                   let errorMsg = `HTTP error! status: ${response.status}`;
+                   try {
+                       const errData = await response.json();
+                       errorMsg += `: ${errData.status || 'Unknown error'}`;
+                   } catch (e) {/* Ignore JSON parsing error */}
+                   throw new Error(errorMsg);
+                }
+                console.log("Start request successful. Beginning log polling.");
+                // Start polling for updates
+                if (intervalId) clearInterval(intervalId); // Clear previous interval if any
+                intervalId = setInterval(updateLog, 1500); // Poll every 1.5 seconds
+                await updateLog(); // Initial update
+            } catch (error) {
+                 console.error('Error starting trivia:', error);
+                 logElement.textContent = `Error starting trivia: ${error}. Check console.`;
+                 stopPolling(); // Reset state
+            }
+        });
+
+         // Event listener for the stop button
+        stopButton.addEventListener('click', async () => {
+            stopButton.disabled = true; // Disable stop button immediately
+            logElement.textContent += '\n\nRequesting stop...';
+             try {
+                // Use absolute path from root
+                const response = await fetch('/api/loadgen/stop', { method: 'POST' });
+                if (!response.ok) {
+                    let errorMsg = `HTTP error! status: ${response.status}`;
+                   try {
+                       const errData = await response.json();
+                       errorMsg += `: ${errData.status || 'Unknown error'}`;
+                   } catch (e) {/* Ignore JSON parsing error */}
+                   throw new Error(errorMsg);
+                }
+                console.log("Stop request successful.");
+                // Stop polling will happen naturally or on next fetch error if thread stops slowly
+                // Fetch final log state after a short delay to allow backend to update
+                setTimeout(async () => {
+                    await updateLog();
+                    if(isRunning) { // Only stop polling if it was actually running
+                         logElement.textContent += '\n\nTrivia stopped by user.';
+                         stopPolling();
+                    }
+                }, 500);
+             } catch(error) {
+                 console.error('Error stopping trivia:', error);
+                 logElement.textContent += `\nError stopping trivia: ${error}. Check console.`;
+                 // Still attempt to stop polling and reset buttons
+                 stopPolling();
+             }
+        });
+
+        // Set initial button states
+        startButton.disabled = false;
+        stopButton.disabled = true;
+
+        // Clean up polling when the page is closed/refreshed
+        window.addEventListener('beforeunload', () => {
+            if (isRunning) {
+                // Optionally try to send a stop request, but it might not complete
+                // navigator.sendBeacon('/api/loadgen/stop', ''); // Beacon API is more reliable for unload
+                console.log("Page unloading, stopping polling.");
+            }
+            stopPolling();
+        });
+
+    </script>
+</body>
+</html> 

@@ -1,0 +1,15 @@
+services:
+    load-generator:
+      build: 
+        context: ./load-generator
+        dockerfile: Dockerfile
+        network: host
+      container_name: load-generator # Optional: Give it a consistent name
+      # ports:
+      #   - "5001:5001"
+      network_mode: host
+      devices:
+          - /dev/kfd
+          - /dev/dri    
+      restart: unless-stopped
+  
