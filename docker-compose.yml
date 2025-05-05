@@ -1,4 +1,21 @@
-include:
+services:
+  qwen3-4b:      # VLLM small (gpus 0-3)
+    profiles: ["qwen3-4b", "all"]
+  qwen2-5-7b:    # VLLM medium (gpus 4-7)
+    profiles: ["qwen2.5-7b", "all"]
+  phi-4-mini:    # VLLM small (gpus 8-11)
+    profiles: ["phi-4-mini", "all"]
+  mistral-nemo:  # VLLM medium (gpus 12-15)
+    profiles: ["mistral-nemo", "all"]
+  bge-embeddings: # VLLM embeddings (gpus 16-19)
+    profiles: ["bge-embeddings", "all"]
+  bge-reranker:  # VLLM reranker (gpus 20-23)
+    profiles: ["bge-reranker", "all"]
+  sglang:        # SGLang models (gpus 24-31)
+    profiles: ["sglang", "all"]
+
+x-compose-files:
   - docker-compose.vllm.yaml
   - docker-compose.sglang.yaml
+  - docker-compose.litellm.yaml
   - docker-compose.load-generator.yaml
