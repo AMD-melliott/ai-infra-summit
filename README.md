@@ -86,7 +86,7 @@ This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute
 
 You can use the `amd-smi` tool (part of the ROCm installation) to manage partitioning.
 
-* **Check Current Mode:**
+**Check Current Mode:**
 
 Run this command to view the partition mode for GPU 0. All GPUs in the system are partitioned in the same mode, so if GPU 0 is in CPX mode, all GPUs are in CPX mode
 
@@ -96,7 +96,7 @@ sudo amd-smi partition -g 0
 
 Omitting `-g 0` will show information for all GPUs, if needed
 
-* **Change to CPX Mode (if necessary):**
+**Change to CPX Mode (if necessary):**
 
 ```bash
 sudo amd-smi set -C cpx
@@ -112,21 +112,24 @@ Refer to the [AMD ROCm documentation](https://rocm.docs.amd.com/) and the [Compu
 
 ## Usage
 
-* **Configure Environment:**
-  * Copy the example environment file: `cp env.example .env`
-  * Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
+**Configure Environment:**
 
-* **Download Models:**
-  * Ensure the models specified in `models.yaml` are downloaded to the directorie specified in your `.env` file.
+* Copy the example environment file: `cp env.example .env`
+* Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
 
-* **Run Services:**
-  * To start all services (vLLM, SGLang, LiteLLM Proxy, Load Generator):
+**Download Models:**
+  
+Ensure the models specified in `models.yaml` are downloaded to the directorie specified in your `.env` file.
+
+**Run Services:**
+
+To start all services (vLLM, SGLang, LiteLLM Proxy, Load Generator):
 
 ```bash
 docker compose up -d
 ```
 
-* To start specific services:
+To start specific services:
 
 ```bash
 # Start only vLLM instances
@@ -139,13 +142,13 @@ docker compose up -d proxy
 docker compose up -d vllm load-generator # Adjust service names as needed
 ```
 
-* **View Logs:**
+**View Logs:**
 
 ```bash
 docker compose logs -f <service_name> # e.g., docker compose logs -f proxy
 ```
 
-* **Stop Services:**
+**Stop Services:**
 
 ```bash
 docker compose down
