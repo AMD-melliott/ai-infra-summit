@@ -35,6 +35,46 @@ The `models.yaml` file configures the LiteLLM proxy, defining which backend infe
 
 Each entry maps a model name requested via the proxy to the specific `api_base` (the URL of the backend vLLM/SGLang instance) that serves it.
 
+## Logical Diagram
+
+```mermaid
+graph TD
+    LG[Load Generator] --> LB[LiteLLM Proxy<br>Load Balancer]
+    
+    subgraph "Model Servers"
+        subgraph "vLLM Models"
+            V1[vLLM Models 0-3<br>Qwen3-4B]
+            V2[vLLM Models 4-7<br>Qwen2.5-7B]
+            V3[vLLM Models 8-11<br>Phi-4-mini-instruct]
+            V4[vLLM Models 12-15<br>Mistral-Nemo]
+            V5[vLLM Models 16-19<br>BGE Embeddings]
+            V6[vLLM Models 20-23<br>BGE Reranker]
+        end
+        
+        subgraph "SGLang Models"
+            S1[SGLang Models 0-3<br>Qwen3-14B]
+        end
+    end
+    
+    LB --> V1
+    LB --> V2
+    LB --> V3
+    LB --> V4
+    LB --> V5
+    LB --> V6
+    LB --> S1
+
+    style LG fill:#f9f,stroke:#333,stroke-width:2px
+    style LB fill:#bbf,stroke:#333,stroke-width:2px
+    style V1 fill:#dfd,stroke:#333,stroke-width:1px
+    style V2 fill:#dfd,stroke:#333,stroke-width:1px
+    style V3 fill:#dfd,stroke:#333,stroke-width:1px
+    style V4 fill:#dfd,stroke:#333,stroke-width:1px
+    style V5 fill:#dfd,stroke:#333,stroke-width:1px
+    style V6 fill:#dfd,stroke:#333,stroke-width:1px
+    style S1 fill:#fdd,stroke:#333,stroke-width:1px
+```
+
 ## GPU Partitioning
 
 This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute Partition (CPX)** mode.
