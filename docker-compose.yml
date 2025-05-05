@@ -1,22 +1,4 @@
-# Main docker-compose file for "Model Serving Swiss Army Knife" Demo
-# This integrates all the individual service components
-
-# Use this file as a base and add specific service compose files using the -f flag.
-# Example:
-# docker-compose -f docker-compose.yml \
-#  -f docker-compose.nginx.yml \
-#  -f docker-compose.metrics.yml \
-#  -f docker-compose.vllm.yml \
-#  up -d
-
-version: '3.8' # Define the version here for consistency
-
-# Define networks or volumes if needed globally across services
-# networks:
-#   default:
-#     driver: bridge
-
-# services: # Service definitions are now in separate files
-#  # API Gateway definition moved to docker-compose.nginx.yml
-
-#  # Metrics Aggregator definition moved to docker-compose.metrics.yml
+include:
+  - docker-compose.vllm.yaml
+  - docker-compose.sglang.yaml
+  - docker-compose.load-generator.yaml

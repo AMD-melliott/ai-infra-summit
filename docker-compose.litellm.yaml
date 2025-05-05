@@ -1,0 +1,10 @@
+services:
+  proxy:
+    image: litellm/litellm:latest
+    network_mode: host
+    command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
+    restart: on-failure      
+    environment:
+      - OPENAI_API_KEY="sk-1234"
+    volumes:
+      - .models.yaml:/app/config.yaml

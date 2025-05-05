@@ -8,24 +8,27 @@ x-defaults: &defaults
     security_opt:
         - seccomp:unconfined
     ipc: "host"
-    shm_size: "64G"
-    ulimits:
-      memlock: 2147483648
-      stack: 2147483648
+    shm_size: "128G"
+    volumes:
+      - ${CACHE_PATH}:/root/.cache/huggingface
+    environment:
+      HF_HOME: /root/.cache/huggingface   
+      VLLM_USE_TRITON_FLASH_ATTN: 0
+      TRUST_REMOTE_CODE: "true"
+      VLLM_USE_V1: 0
+      VLLM_USE_AITER: 1
+      PYTORCH_HIP_ALLOC_CONF: expandable_segments:True      
+    env_file:
+      - .env
 
 services:
-  sglang:
+  sglang-00:
     <<: [*defaults, *devices]
     image: $SGLANG_IMAGE
-    command: python3 -m sglang.launch_server --model deepseek-ai/DeepSeek-R1-Distill-Llama-70B --tp 8 --trust-remote-code --expert-parallel-size 1 --reasoning-parser deepseek-r1 --port 9000
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9000
     network_mode: host
-    volumes:
-      - /data2/hf_home:/root/.cache/huggingface
-      - /data2/torchinductor_cache:/torchinductor_cache
     environment:
-      HIP_VISIBLE_DEVICES: "16,17,18,19,20,21,22,23"
-      PYTORCH_HIP_ALLOC_CONF: expandable_segments:True
-    ipc: host
+      HIP_VISIBLE_DEVICES: "24,25"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
       interval: 30s
@@ -34,5 +37,51 @@ services:
       start_period: 60s
       start_interval: 30s
     restart: on-failure
-    env_file: 
-      - .env
+
+  sglang-01:
+    <<: [*defaults, *devices]
+    image: $SGLANG_IMAGE
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9001
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "26,27"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+      start_interval: 30s
+    restart: on-failure
+
+  sglang-02:
+    <<: [*defaults, *devices]
+    image: $SGLANG_IMAGE
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9002
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "28,29"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+      start_interval: 30s
+    restart: on-failure
+
+  sglang-03:
+    <<: [*defaults, *devices]
+    image: $SGLANG_IMAGE
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9003
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "30,31"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+      start_interval: 30s
+    restart: on-failure

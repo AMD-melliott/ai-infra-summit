@@ -10,49 +10,35 @@ x-defaults: &defaults
     ipc: "host"
     shm_size: "8G"
     volumes:
-      - /data2/hf_home:/root/.cache/huggingface
+      - ${CACHE_PATH}:/root/.cache/huggingface
     environment:
-      #HIP_FORCE_DEV_KERNARG: 1
-      NCCL_MIN_NCHANNELS: 112      
-      #VLLM_USE_ROCM_CUSTOM_PAGED_ATTN: 1
+      HF_HOME: /root/.cache/huggingface   
       VLLM_USE_TRITON_FLASH_ATTN: 0
-      #VLLM_INSTALL_PUNICA_KERNELS: 1
-      #VLLM_TUNE_GEMM: 0
-      #VLLM_WORKER_MULTIPROC_METHOD: "spawn"
       TRUST_REMOTE_CODE: "true"
       VLLM_USE_V1: 0
       VLLM_USE_AITER: 1
+    env_file:
+      - .env      
 
 services:
-  proxy:
-    image: litellm/litellm:latest
-    network_mode: host
-    command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
-    restart: on-failure      
-    environment:
-      - OPENAI_API_KEY="sk-1234"
-    volumes:
-      - ./vllm/models.yaml:/app/config.yaml
-
   vllm-model0:
     <<: [*defaults, *devices]  
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model0
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8000
     network_mode: host
     environment:
       HIP_VISIBLE_DEVICES: "0"
-    env_file:
-      - .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 90s      
+      start_period: 90s
+
   vllm-model1:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model1
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8001
     network_mode: host 
@@ -69,7 +55,7 @@ services:
 
   vllm-model2:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model2
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8002
     network_mode: host 
@@ -86,7 +72,7 @@ services:
 
   vllm-model3:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model3
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8003
     network_mode: host 
@@ -103,12 +89,12 @@ services:
 
   vllm-model4:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model4
-    command: python -m vllm.entrypoints.openai.api_server -tp 2 --model Qwen/Qwen3-8B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8004
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8004
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "4,5"
+      HIP_VISIBLE_DEVICES: "4"
     env_file:
       - .env
     healthcheck:
@@ -120,12 +106,12 @@ services:
 
   vllm-model5:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model5
-    command: python -m vllm.entrypoints.openai.api_server -tp 2 --model Qwen/Qwen3-8B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8005
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8005
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "6,7"
+      HIP_VISIBLE_DEVICES: "5"
     env_file:
       - .env
     healthcheck:
@@ -137,12 +123,12 @@ services:
 
   vllm-model6:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model6
-    command: python -m vllm.entrypoints.openai.api_server -tp 4 --model Qwen/Qwen3-14B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8006
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8006
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "8,9,10,11"
+      HIP_VISIBLE_DEVICES: "6"
     env_file:
       - .env
     healthcheck:
@@ -154,13 +140,286 @@ services:
 
   vllm-model7:
     <<: [*defaults, *devices]
-    image: $IMAGE
+    image: $VLLM_IMAGE
     container_name: vllm-model7
-    command: python -m vllm.entrypoints.openai.api_server -tp 4 --model Qwen/Qwen3-14B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8007
+    command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8007
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "12,13,14,15"
+      HIP_VISIBLE_DEVICES: "7"
     env_file:
       - .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      interval: 30s
+
+  vllm-model8:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model8
+    command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8008
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "8"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model9:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model9
+    command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8009
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "9"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model10:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model10
+    command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8010
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "10"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model11:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model11
+    command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8011
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "11"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model12:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model12
+    command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8012
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "12"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model13:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model13
+    command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8013
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "13"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model14:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model14
+    command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8014
+    network_mode: host 
+    environment:
+      HIP_VISIBLE_DEVICES: "14"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8014/health"] 
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model15:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model15
+    command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8015
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "15"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8015/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model16:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model16
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8016
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "16"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8016/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model17:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model17
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8017
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "17"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8017/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model18:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model18
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8018
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "18"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8018/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model19:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model19
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8019
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "19"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8019/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model20:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model20
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8020
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "20"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8020/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model21:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model21
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8021
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "21"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8021/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model22:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model22
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8022
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "22"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8022/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  vllm-model23:
+    <<: [*defaults, *devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model23
+    command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8023
+    network_mode: host 
+    environment:  
+      HIP_VISIBLE_DEVICES: "23"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8023/health"] 
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s

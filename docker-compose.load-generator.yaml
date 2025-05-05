@@ -4,9 +4,7 @@ services:
         context: ./load-generator
         dockerfile: Dockerfile
         network: host
-      container_name: load-generator # Optional: Give it a consistent name
-      # ports:
-      #   - "5001:5001"
+      container_name: load-generator
       network_mode: host
       devices:
           - /dev/kfd
