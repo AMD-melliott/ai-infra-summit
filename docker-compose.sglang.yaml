@@ -11,6 +11,7 @@ x-defaults: &defaults
     shm_size: "128G"
     volumes:
       - ${CACHE_PATH}:/root/.cache/huggingface
+    restart: on-failure      
     environment:
       HF_HOME: /root/.cache/huggingface   
       VLLM_USE_TRITON_FLASH_ATTN: 0
@@ -45,6 +46,9 @@ services:
     network_mode: host
     environment:
       HIP_VISIBLE_DEVICES: "26,27"
+    depends_on:
+      sglang-00:
+        condition: service_healthy      
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
       interval: 30s
@@ -61,6 +65,9 @@ services:
     network_mode: host
     environment:
       HIP_VISIBLE_DEVICES: "28,29"
+    depends_on:
+      sglang-01:
+        condition: service_healthy         
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
       interval: 30s
@@ -77,6 +84,9 @@ services:
     network_mode: host
     environment:
       HIP_VISIBLE_DEVICES: "30,31"
+    depends_on:
+      sglang-02:
+        condition: service_healthy         
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
       interval: 30s
