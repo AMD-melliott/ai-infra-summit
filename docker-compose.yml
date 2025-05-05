@@ -1,21 +1,26 @@
-services:
-  qwen3-4b:      # VLLM small (gpus 0-3)
-    profiles: ["qwen3-4b", "all"]
-  qwen2-5-7b:    # VLLM medium (gpus 4-7)
-    profiles: ["qwen2.5-7b", "all"]
-  phi-4-mini:    # VLLM small (gpus 8-11)
-    profiles: ["phi-4-mini", "all"]
-  mistral-nemo:  # VLLM medium (gpus 12-15)
-    profiles: ["mistral-nemo", "all"]
-  bge-embeddings: # VLLM embeddings (gpus 16-19)
-    profiles: ["bge-embeddings", "all"]
-  bge-reranker:  # VLLM reranker (gpus 20-23)
-    profiles: ["bge-reranker", "all"]
-  sglang:        # SGLang models (gpus 24-31)
-    profiles: ["sglang", "all"]
+# Main docker-compose file that includes all other compose files
+name: ai-infra-summit
 
-x-compose-files:
-  - docker-compose.vllm.yaml
-  - docker-compose.sglang.yaml
-  - docker-compose.litellm.yaml
-  - docker-compose.load-generator.yaml
+include:
+  - path: docker-compose.vllm.yaml
+  - path: docker-compose.sglang.yaml
+  - path: docker-compose.litellm.yaml
+  - path: docker-compose.load-generator.yaml
+
+# Define a default service so "docker compose up -d" works without specifying services
+services:
+  default:
+    image: busybox
+    command: echo "Starting all services via dependencies"
+    profiles: ["all", "default"]
+    depends_on:
+      # List all top-level services that should start by default
+      - proxy
+      # Add dependencies for each model group
+      - vllm-model0  # qwen3-4b group
+      - vllm-model4  # qwen2.5-7b group
+      - vllm-model8  # phi-4-mini group
+      - vllm-model12 # mistral-nemo group
+      - vllm-model16 # bge-embeddings group
+      - vllm-model20 # bge-reranker group
+      - sglang-00    # sglang group

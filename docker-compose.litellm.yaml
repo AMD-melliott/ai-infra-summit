@@ -7,4 +7,14 @@ services:
     environment:
       - OPENAI_API_KEY="sk-1234"
     volumes:
-      - .models.yaml:/app/config.yaml
+      - ./models.yaml:/app/config.yaml
+    profiles: ["all", "default"]
+    depends_on:
+      # Add dependencies for proxy to ensure models are available
+      - vllm-model3  # Last Qwen3-4B model
+      - vllm-model7  # Last Qwen2.5-7B model
+      - vllm-model11 # Last Phi-4-mini model
+      - vllm-model15 # Last Mistral-Nemo model
+      - vllm-model19 # Last BGE Embeddings model
+      - vllm-model23 # Last BGE Reranker model
+      - sglang-03    # Last SGLang model
