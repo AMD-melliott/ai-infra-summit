@@ -11,16 +11,18 @@ app = Flask(__name__)
 # --- Configuration ---
 LITELLM_ENDPOINT = "http://localhost:4000"
 API_KEY = "sk-1234" # Replace with your actual key if different
-MODELS_TO_USE = ["Qwen/Qwen3-4B", "Qwen/Qwen3-8B", "Qwen/Qwen3-14B", "deepseek-ai/DeepSeek-R1-Distill-Llama-70B"] # Models from models.yaml
+MODELS_TO_USE = ["Qwen/Qwen3-4B", "Qwen/Qwen2.5-7B", "microsoft/Phi-4-mini-instruct", "mistralai/Mistral-Nemo-Instruct-FP8-2407"] # Models from models.yaml
 
 # --- Model Specific Configuration ---
 # Define EOS tokens for models (add more as needed)
 # Check tokenizer_config.json on Hugging Face for the correct token
 MODEL_STOP_TOKENS = {
     "Qwen/Qwen3-4B": ["<|im_end|>"],
-    "Qwen/Qwen3-8B": ["<|im_end|>"],
-    "Qwen/Qwen3-14B": ["<|im_end|>"],
+    "Qwen/Qwen2.5-7B": ["<|im_end|>"],
     "deepseek-ai/DeepSeek-R1-Distill-Llama-70B": ["<|eot_id|>"],
+    "meta-llama/Llama-3.2-3B": ["<|eot_id|>"],
+    "microsoft/Phi-4-mini-instruct": ["<|eot_id|>"],
+    "mistralai/Mistral-Nemo-Instruct-FP8-2407": ["<|eot_id|>"]
     # Example for Llama:
     # "meta-llama/Llama-3-8B-Instruct": ["<|eot_id|>", "</s>"], # Llama 3 uses <|eot_id|> but check specific tokenizer
     # Example for Mistral:
@@ -38,6 +40,30 @@ TRIVIA_QUESTIONS = [
     "What is the largest ocean on Earth?",
     "What is the square root of 64?",
     "Who was the first President of the United States?",
+    "What was the name of the first general-purpose electronic digital computer?",
+    "Who is often considered the first computer programmer for her work on the Analytical Engine?",
+    "What does the term 'bug' in computing historically refer to?",
+    "What does HTML stand for?",
+    "Who invented the World Wide Web?",
+    "What operating system kernel was famously created by Linus Torvalds?",
+    "What was the name of the Microsoft Office assistant shaped like a paperclip?",
+    "What does SQL stand for?",
+    "What is the time complexity of an ideal binary search algorithm?",
+    "Which popular version control system shares its name with a British insult?",
+    "What does 'LASER' stand for?",
+    "In networking, what does TCP stand for?",
+    "What was the first commercially successful video game?",
+    "What is the hexadecimal equivalent of the decimal number 15?",
+    "Who co-founded Microsoft with Bill Gates?",
+    "Which programming language, known for its logo of a steaming coffee cup, was originally called 'Oak'?",
+    "What is the significance of the date January 1, 1970, in Unix systems?",
+    "How many programmers does it take to change a light bulb?",
+    "What does the 'chmod 777' command typically grant in Unix-like systems?",
+    "Before Windows, what was Microsoft's primary text-based operating system?",
+    "What observation, often called a 'law', states that the number of transistors on a microchip doubles approximately every two years?",
+    "What was the precursor network to the modern Internet, developed by DARPA?",
+    "Why don't scientists trust atoms?",
+    "What is the answer to the ultimate question of life, the universe, and everything?"
 ]
 DELAY_BETWEEN_QUESTIONS = 3 # Seconds
 # DELAY_BETWEEN_MODELS = 2 # Seconds - Removed, handled by DELAY_BETWEEN_QUESTIONS
