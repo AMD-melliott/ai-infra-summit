@@ -1,6 +1,3 @@
-# Main docker-compose file that includes all other compose files
-name: ai-infra-summit
-
 include:
   - path: docker-compose.vllm.yaml
   - path: docker-compose.sglang.yaml
@@ -12,11 +9,9 @@ services:
   default:
     image: busybox
     command: echo "Starting all services via dependencies"
-    profiles: ["all", "default"]
+    network_mode: host
     depends_on:
-      # List all top-level services that should start by default
       - proxy
-      # Add dependencies for each model group
       - vllm-model0  # qwen3-4b group
       - vllm-model4  # qwen2.5-7b group
       - vllm-model8  # phi-4-mini group

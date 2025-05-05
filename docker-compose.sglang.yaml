@@ -38,7 +38,6 @@ services:
       start_period: 60s
       start_interval: 30s
     restart: on-failure
-    profiles: ["sglang", "all", "default"]
 
   sglang-01:
     <<: [*defaults, *devices]
@@ -58,7 +57,6 @@ services:
       start_period: 60s
       start_interval: 30s
     restart: on-failure
-    profiles: ["sglang", "all", "default"]
 
   sglang-02:
     <<: [*defaults, *devices]
@@ -78,7 +76,6 @@ services:
       start_period: 60s
       start_interval: 30s
     restart: on-failure
-    profiles: ["sglang", "all", "default"]
 
   sglang-03:
     <<: [*defaults, *devices]
@@ -98,4 +95,3 @@ services:
       start_period: 60s
       start_interval: 30s
     restart: on-failure
-    profiles: ["sglang", "all", "default"]

@@ -37,7 +37,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen3-4b", "all", "default"]
 
   vllm-model1:
     <<: [*defaults, *devices]
@@ -56,7 +55,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen3-4b", "all", "default"]
 
   vllm-model2:
     <<: [*defaults, *devices]
@@ -75,7 +73,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen3-4b", "all", "default"]
 
   vllm-model3:
     <<: [*defaults, *devices]
@@ -94,7 +91,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen3-4b", "all", "default"]
 
   # Qwen2.5-7B Group (GPUs 4-7)
   vllm-model4:
@@ -111,7 +107,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen2.5-7b", "all", "default"]
 
   vllm-model5:
     <<: [*defaults, *devices]
@@ -130,7 +125,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen2.5-7b", "all", "default"]
 
   vllm-model6:
     <<: [*defaults, *devices]
@@ -149,7 +143,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["qwen2.5-7b", "all", "default"]
 
   vllm-model7:
     <<: [*defaults, *devices]
@@ -165,7 +158,9 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
       interval: 30s
-    profiles: ["qwen2.5-7b", "all", "default"]
+      timeout: 5s
+      retries: 5
+      start_period: 90s
 
   # Phi-4-mini Group (GPUs 8-11)
   vllm-model8:
@@ -182,7 +177,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["phi-4-mini", "all", "default"]
 
   vllm-model9:
     <<: [*defaults, *devices]
@@ -201,7 +195,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["phi-4-mini", "all", "default"]
 
   vllm-model10:
     <<: [*defaults, *devices]
@@ -220,7 +213,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["phi-4-mini", "all", "default"]
 
   vllm-model11:
     <<: [*defaults, *devices]
@@ -239,7 +231,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["phi-4-mini", "all", "default"]
 
   # Mistral-Nemo Group (GPUs 12-15)
   vllm-model12:
@@ -256,7 +247,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["mistral-nemo", "all", "default"]
 
   vllm-model13:
     <<: [*defaults, *devices]
@@ -275,7 +265,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["mistral-nemo", "all", "default"]
 
   vllm-model14:
     <<: [*defaults, *devices]
@@ -294,7 +283,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["mistral-nemo", "all", "default"]
 
   vllm-model15:
     <<: [*defaults, *devices]
@@ -313,7 +301,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["mistral-nemo", "all", "default"]
 
   # BGE Embeddings Group (GPUs 16-19)
   vllm-model16:
@@ -330,7 +317,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-embeddings", "all", "default"]
 
   vllm-model17:
     <<: [*defaults, *devices]
@@ -349,7 +335,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-embeddings", "all", "default"]
 
   vllm-model18:
     <<: [*defaults, *devices]
@@ -368,7 +353,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-embeddings", "all", "default"]
 
   vllm-model19:
     <<: [*defaults, *devices]
@@ -387,7 +371,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-embeddings", "all", "default"]
 
   # BGE Reranker Group (GPUs 20-23)
   vllm-model20:
@@ -404,7 +387,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-reranker", "all", "default"]
 
   vllm-model21:
     <<: [*defaults, *devices]
@@ -423,7 +405,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-reranker", "all", "default"]
 
   vllm-model22:
     <<: [*defaults, *devices]
@@ -442,7 +423,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-reranker", "all", "default"]
 
   vllm-model23:
     <<: [*defaults, *devices]
@@ -461,4 +441,3 @@ services:
       timeout: 5s
       retries: 5
       start_period: 90s
-    profiles: ["bge-reranker", "all", "default"]

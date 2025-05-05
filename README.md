@@ -123,24 +123,13 @@ Ensure the models specified in `models.yaml` are downloaded to the directorie sp
 
 **Run Services:**
 
-To start all services (vLLM, SGLang, LiteLLM Proxy, Load Generator):
+To start all services (vLLM, SGLang, LiteLLM Proxy, Load Generator) defined in the Compose files, simply run:
 
 ```bash
 docker compose up -d
 ```
 
-To start specific services:
-
-```bash
-# Start only vLLM instances
-docker compose up -d vllm # Adjust if service names differ in docker-compose.vllm.yaml
-# Start only SGLang instances
-docker compose up -d sglang # Adjust if service names differ in docker-compose.sglang.yaml
-# Start the LiteLLM proxy
-docker compose up -d proxy
-# Start vLLM instances and the load generator
-docker compose up -d vllm load-generator # Adjust service names as needed
-```
+This command will start all services and detach, running them in the background. The `depends_on` configurations within the Compose files ensure that services start in the correct order and wait for dependencies to become healthy.
 
 **View Logs:**
 
