@@ -4,6 +4,8 @@
 
 This repository contains the files needed to replicate the demo presented at [AI Infra Summit 3](https://aiinfra.live) on 5/3/25. It includes configurations for different inference servers (like vLLM and SGLang) and a load generator to demonstate a requests to the various models.
 
+**Many thanks** to [Vultr](https://www.vultr.com/) for providing an AMD Instinct MI325X bare metal instace to build and host this demo. Find more information about Vultr's Instinct-based offerings here: [https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/](https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/)
+
 ## Prerequisites
 
 * **AMD Instinct™ GPU:** This demo is configured for AMD Instinct GPUs. Ensure you have the [necessary drivers installed](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html).
@@ -82,11 +84,11 @@ This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute
 * **SPX (Single Partition):** The default mode where the entire GPU is treated as a single unit.
 * **CPX (Compute Partition):** Divides the GPU into multiple compute partitions (virtual GPUs), each with dedicated compute units and a portion of the HBM memory. This allows multiple independent workloads to run concurrently on a single physical GPU. This demo assumes CPX mode is enabled to run multiple model instances efficiently.
 
-**Checking and Setting Partition Mode:**
+### Checking and Setting Partition Mode
 
 You can use the `amd-smi` tool (part of the ROCm installation) to manage partitioning.
 
-**Check Current Mode:**
+#### Check Current Mode
 
 Run this command to view the partition mode for GPU 0. All GPUs in the system are partitioned in the same mode, so if GPU 0 is in CPX mode, all GPUs are in CPX mode
 
@@ -96,13 +98,15 @@ sudo amd-smi partition -g 0
 
 Omitting `-g 0` will show information for all GPUs, if needed
 
-**Change to CPX Mode (if necessary):**
+#### Change to CPX Mode
 
 ```bash
 sudo amd-smi set -C cpx
 ```
 
-**Change back to SPX Mode (if needed later):**
+#### Change back to SPX Mode
+
+Use the command below to change back to `SPX` partitioning mode when you are done.
 
 ```bash
 sudo amd-smi set -C spx
@@ -112,16 +116,16 @@ Refer to the [AMD ROCm documentation](https://rocm.docs.amd.com/) and the [Compu
 
 ## Usage
 
-**Configure Environment:**
+### Configure Environment
 
 * Copy the example environment file: `cp env.example .env`
 * Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
 
-**Download Models:**
+### Download Models
   
-Ensure the models specified in `models.yaml` are downloaded to the directorie specified in your `.env` file.
+Ensure the models specified in `models.yaml` are downloaded to the directorie specified in your `.env` file. Models can be downloaded with `huggingface-cli`.
 
-**Run Services:**
+### Run Services
 
 To start all services (vLLM, SGLang, LiteLLM Proxy, Load Generator) defined in the Compose files, simply run:
 
@@ -131,13 +135,31 @@ docker compose up -d
 
 This command will start all services and detach, running them in the background. The `depends_on` configurations within the Compose files ensure that services start in the correct order and wait for dependencies to become healthy.
 
-**View Logs:**
+**NOTE:** It may take several minutes for all services to start. If any services fail to start, run `docker compose up -d` again.
+
+### View Service Status
+
+Use this command to view service status. All inference servers should show a status of `healthy`.
+
+```bash
+docker compose ps
+```
+
+### View Logs
+
+View logs for a specific service:
 
 ```bash
 docker compose logs -f <service_name> # e.g., docker compose logs -f proxy
 ```
 
-**Stop Services:**
+View all logs:
+
+```bash
+docker compose logs -f
+```
+
+### Stop Services
 
 ```bash
 docker compose down
