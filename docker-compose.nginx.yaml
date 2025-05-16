@@ -1,0 +1,11 @@
+services:
+  # API Gateway for unified access to all models
+  api-gateway:
+    image: nginx:alpine
+    container_name: api-gateway
+    network_mode: host    
+    volumes:
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./dashboard:/usr/share/nginx/html:ro # Ensures dashboard files are served
+      - ./load-generator:/usr/share/nginx/load-generator:ro # Mount load generator UI files
+    restart: unless-stopped 
