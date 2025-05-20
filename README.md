@@ -87,7 +87,7 @@ The system uses the following TCP ports:
 
 | Service | Port Range |
 |---------|------------|
-| vLLM Servers | 8000-8023, 8032-8043 |
+| vLLM Servers | 8000-8043 |
 | SGLang Servers | 9101-9108 |
 | LiteLLM Proxy | 4000 |
 | Open WebUI | 8081 |
@@ -135,6 +135,7 @@ Ensure the models specified in `models.yaml` are downloaded to the directories c
 ### 3. Start Services
 
 Launch all services with Docker Compose:
+
 ```bash
 docker compose up -d
 ```
@@ -169,27 +170,3 @@ To add new models:
 1. Update the `models.yaml` file with your model configuration
 2. Ensure the model is accessible in your model storage path
 3. Restart the services with `docker compose restart proxy`
-
-### Scaling Resources
-
-Adjust the GPU partitioning in the Docker Compose files to allocate more or fewer resources to specific models based on your requirements.
-
-## Troubleshooting
-
-- **GPU Not Found**: Ensure ROCm drivers are properly installed and the GPU is in CPX mode
-- **Model Loading Failures**: Check model paths and verify Hugging Face token permissions
-- **Port Conflicts**: Ensure the required ports are available on your system
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- AMD ROCm Team for enabling GPU partitioning capabilities
-- vLLM, SGLang, and LiteLLM projects for their excellent model serving frameworks
-- All contributors to the open-source models used in this demo
