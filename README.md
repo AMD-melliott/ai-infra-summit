@@ -2,21 +2,21 @@
 
 ## Overview
 
-This repository contains the files needed to set up a comprehensive model serving platform on AMD Instinct GPUs. The project leverages GPU partitioning for efficient resource utilization and deploys multiple inference servers to handle various model types through a unified API.
+This repository contains the files needed to set up a demo model serving platform on AMD Instinct GPUs. By splitting the GPU into smaller virtual parts, you can efficiently run different models simultaneously and access them all through a single API.
 
 This demo was originally presented at [AI Infra Summit 3](https://aiinfra.live) on May 3, 2025.
 
 ## Key Features
 
 - **Multi-Model Deployment**: Deploy multiple models of different sizes and architectures simultaneously
-- **GPU Partitioning**: Efficient utilization of AMD Instinct GPUs CPX partition mode (8 Logical GPUs per Pyhsical GPU)
+- **GPU Partitioning**: Efficient utilization of AMD Instinct GPUs CPX partition mode (8 Logical GPUs per Physical GPU)
 - **Unified API**: Single OpenAI-compatible endpoint for accessing all models through LiteLLM proxy
 - **Multiple Inference Engines**: Support for vLLM and SGLang to optimize for different model architectures
 - **Real-time Monitoring**: Status dashboard showing deployed models and GPU VRAM utilization
 - **Interactive UI**: Web interface for testing models and generating loads
 - **Load Testing**: Built-in tools to simulate workloads and test scaling
 
-**Many thanks** to [Vultr](https://www.vultr.com/) for providing an AMD Instinct MI325X bare metal instace to build and host this demo. Find more information about Vultr's Instinct-based offerings here: [https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/](https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/)
+**Many thanks** to [Vultr](https://www.vultr.com/) for providing an AMD Instinct MI325X bare metal instance to build and host this demo. Find more information about Vultr's Instinct-based offerings here: [https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/](https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/)
 
 ### Screenshots
 
@@ -36,22 +36,21 @@ This demo was originally presented at [AI Infra Summit 3](https://aiinfra.live) 
 
 ## Prerequisites
 
-* **AMD Instinct™ GPU**: This demo is designed for AMD Instinct GPUs. Ensure you have the [necessary drivers installed](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html).
-* Docker and Docker Compose installed.
-* Hugging Face Hub token (if downloading private models).
+* **AMD Instinct™ GPU**: You'll need access to an AMD Instinct GPU with the [drivers installed](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html).
+* **Docker**: Docker and Docker Compose to run the containerized services.
+* **Hugging Face Account**: A Hugging Face token if you want to use any private models.
 
-> **Note:** This setup utilizes `network_mode: host` in the Docker Compose configurations. This means the containers share the host's network stack, which simplifies networking between containers but has security implications. Ensure you understand the consequences before deploying in production.
+> **Note:** This demo uses `network_mode: host` for simplicity, which means the containers share your server's network. This makes things easier but isn't recommended for production environments without additional security measures.
 
 ## Architecture
 
-The platform consists of the following components:
+The demo is made up of these components:
 
-* **vLLM Instances**: Multiple instances serving various models, each targeting specific GPU partitions
-* **SGLang Instances**: Additional inference servers optimized for certain model architectures
-* **LiteLLM Proxy**: Unified API endpoint that routes requests to appropriate backend servers
-* **Open WebUI**: Interactive interface for testing models
-* **Status Dashboard**: Real-time monitoring of models and GPU utilization
-* **Load Generator**: Tool for simulating workloads and testing performance
+* **Model Servers**: Multiple vLLM and SGLang servers, each running different AI models
+* **Central API**: A LiteLLM server that routes your requests to the right model
+* **Web Interface**: A simple UI for interacting with deployed models
+* **Monitoring**: A dashboard showing what's running and how resources are being used
+* **Load Testing**: Tools to simulate many users and test performance
 
 ### Logical Diagram
 
@@ -96,54 +95,105 @@ The system uses the following TCP ports:
 
 ## GPU Partitioning Setup
 
-This demo leverages AMD GPU partitioning and requires the GPU to be in **CPX Partition** mode to run several models concurrently.
+This demo uses a feature of AMD GPUs that lets you split one physical GPU into multiple virtual GPUs. To run several models at once, we need to set the GPU to "CPX Partition" mode.
+
+### Understanding SPX and CPX Modes
+
+AMD Instinct GPUs support different compute partition modes that affect how the GPU presents itself to applications:
+
+- **SPX (Single Partition X-celerator)**: The default mode where all compute chiplets (XCDs) appear as a single logical GPU. This provides a unified view but offers less control over workload placement.
+
+- **CPX (Core Partitioned X-celerator)**: Each compute chiplet appears as a separate logical GPU (8 separate GPUs per MI300X/MI325X). This gives explicit control over which chiplet runs which workload, allowing multiple models to run simultaneously on separate partitions.
 
 ### Checking and Setting Partition Mode
 
-Check current partition mode for GPU 0:
+To see how your GPU is currently set up, check current partition mode for GPU 0:
 
 ```bash
 sudo amd-smi partition -g 0
 ```
 
-If the GPU is in SPX partition mode, change to CPX mode:
+If it shows "SPX" mode, change it to "CPX" mode with:
 
 ```bash
 sudo amd-smi set -C cpx
 ```
 
-To return to SPX mode when finished with the demo:
+When you're done with the demo and want to switch back:
 
 ```bash
 sudo amd-smi set -C spx
 ```
 
-For more details, refer to the [AMD ROCm documentation](https://rocm.docs.amd.com/) and the [Compute and Memory Modes Blog Post](https://rocm.blogs.amd.com/software-tools-optimization/compute-memory-modes/README.html).
+For more details, check out the [AMD ROCm documentation](https://rocm.docs.amd.com/) and this [blog post about Compute and Memory Modes](https://rocm.blogs.amd.com/software-tools-optimization/compute-memory-modes/README.html).
 
 ## Getting Started
 
 ### 1. Configure Environment
 
-Copy and edit the environment file:
+Create your configuration file by copying the example:
+
 ```bash
 cp env.example .env
 ```
 
-Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
+Open the `.env` file and update it with:
+
+- Where you want to store your models
+- Where to cache data
+- Your Hugging Face token (if you need private models)
 
 ### 2. Download Models
 
-Ensure the models specified in `models.yaml` are downloaded to the directories configured in your `.env` file.
+Make sure all the models listed in `models.yaml` are downloaded to your model storage directory.
 
 ### 3. Start Services
 
-Launch all services with Docker Compose:
+Launch everything with `docker compose`:
 
 ```bash
 docker compose up -d
 ```
 
-This will start all services and run them in the background. The `depends_on` configurations ensure that services start in the correct order.
+This starts all the needed services in the background. Note that it can take several minutes for all inference services to fully start and load the models. Once all services are running, use the LiteLLM `/health` endpoint to validate that inference servers are working.
+
+```bash
+curl -sS http://localhost:4000/health | jq
+```
+
+```json
+{
+  "healthy_endpoints": [
+    {
+      "model": "openai/Qwen/Qwen3-4B",
+      "api_base": "http://localhost:8000/v1"
+    },
+    {
+      "model": "openai/Qwen/Qwen3-4B",
+      "api_base": "http://localhost:8001/v1"
+    },
+    {
+      "model": "openai/Qwen/Qwen3-4B",
+      "api_base": "http://localhost:8002/v1"
+    },
+[output truncated]
+    {
+      "model": "openai/CohereLabs/c4ai-command-r7b-12-2024",
+      "api_base": "http://localhost:8041/v1"
+    },
+    {
+      "model": "openai/CohereLabs/c4ai-command-r7b-12-2024",
+      "api_base": "http://localhost:8042/v1"
+    },
+    {
+      "model": "openai/CohereLabs/c4ai-command-r7b-12-2024",
+      "api_base": "http://localhost:8043/v1"
+    }    
+  ],
+  "healthy_count": 44,
+  "unhealthy_count": 0
+}                    
+```
 
 ### 4. Access Interfaces
 
@@ -152,13 +202,35 @@ This will start all services and run them in the background. The `depends_on` co
 - **Load Generator**: http://localhost:8080/load-generator/
 - **LiteLLM API**: http://localhost:4000
 
-### 5. Monitor Logs
+### 5. Accessing Remotely via SSH Tunneling
+
+Since this demo runs on enterprse server hardware, you'll likely be running it on a remote machine or cloud provider. To view the web interfaces on your local computer, you can create a secure connection using SSH:
+
+```bash
+# Connect to your remote server and make the web interfaces available locally
+ssh -L 8080:localhost:8080 -L 8081:localhost:8081 -L 4000:localhost:4000 username@remote-server
+```
+
+After connecting, simply open your web browser and go to the local URLs listed above (like http://localhost:8080). Your browser will connect to the remote server through the secure tunnel you created.
+
+For convenience, you can save these settings in your SSH config file (` ~/.ssh/config `):
+
+```bash
+# Host ai-demo
+#   HostName remote-server-ip-or-name
+#   User username
+#   LocalForward 8080 localhost:8080
+#   LocalForward 8081 localhost:8081
+#   LocalForward 4000 localhost:4000
+```
+
+### 6. Monitor Logs
 
 ```bash
 docker compose logs -f <service_name>  # e.g., docker compose logs -f proxy
 ```
 
-### 6. Stop Services
+### 7. Stop Services
 
 ```bash
 docker compose down
@@ -168,8 +240,14 @@ docker compose down
 
 ### Adding New Models
 
-To add new models:
+Want to add your own models? It's easy:
 
-1. Update the `models.yaml` file with your model configuration
-2. Ensure the model is accessible in your model storage path
-3. Restart the services with `docker compose restart proxy`
+1. Add your model's details to the `models.yaml` file
+2. Download the model to your models directory
+3. Edit `docker-compose.vllm.yaml` and/or `docker-compose.sglang.yaml` as needed
+4. Bring up the new models with `docker compose up -d`
+4. Restart the proxy with `docker compose restart proxy`
+
+## Questions?
+
+Please open an [issue](https://github.com/AMD-melliott/ai-infra-summit/issues) in this repo with any questions.

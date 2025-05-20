@@ -228,3 +228,4 @@ model_list:
   - model_name: CohereLabs/c4ai-command-r7b-12-2024
     litellm_params:
       model: openai/CohereLabs/c4ai-command-r7b-12-2024
+      api_base: http://localhost:8043/v1
