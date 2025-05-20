@@ -96,21 +96,24 @@ The system uses the following TCP ports:
 
 ## GPU Partitioning Setup
 
-This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute Partition (CPX)** mode to run multiple model instances efficiently.
+This demo leverages AMD GPU partitioning and requires the GPU to be in **CPX Partitioning** mode to run several models concurrently.
 
 ### Checking and Setting Partition Mode
 
 Check current partition mode for GPU 0:
+
 ```bash
 sudo amd-smi partition -g 0
 ```
 
-Change to CPX mode (if necessary):
+If the GPU is in SPX partitiong mode, change to CPX mode:
+
 ```bash
 sudo amd-smi set -C cpx
 ```
 
-Change back to SPX mode (if needed later):
+To return to SPX mode when finished with the demo:
+
 ```bash
 sudo amd-smi set -C spx
 ```
