@@ -16,6 +16,8 @@ This demo was originally presented at [AI Infra Summit 3](https://aiinfra.live) 
 - **Interactive UI**: Web interface for testing models and generating loads
 - **Load Testing**: Built-in tools to simulate workloads and test scaling
 
+**Many thanks** to [Vultr](https://www.vultr.com/) for providing an AMD Instinct MI325X bare metal instace to build and host this demo. Find more information about Vultr's Instinct-based offerings here: [https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/](https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/)
+
 ### Screenshots
 
 <div align="center">
@@ -31,8 +33,6 @@ This demo was originally presented at [AI Infra Summit 3](https://aiinfra.live) 
 *Demo Load Generator UI*
 
 </div>
-
-**Many thanks** to [Vultr](https://www.vultr.com/) for providing an AMD Instinct MI325X bare metal instace to build and host this demo. Find more information about Vultr's Instinct-based offerings here: [https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/](https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/)
 
 ## Prerequisites
 
@@ -85,9 +85,6 @@ The system comes pre-configured with the following models:
 
 The system uses the following TCP ports:
 
-<<<<<<< HEAD
-### Checking and Setting Partition Mode
-=======
 | Service | Port Range |
 |---------|------------|
 | vLLM Servers | 8000-8023, 8032-8043 |
@@ -96,15 +93,10 @@ The system uses the following TCP ports:
 | Open WebUI | 8081 |
 | Metrics Aggregator | 5001 |
 | Load Generator | 5002 |
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ## GPU Partitioning Setup
 
-<<<<<<< HEAD
-#### Check Current Mode
-=======
 This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute Partition (CPX)** mode to run multiple model instances efficiently.
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ### Checking and Setting Partition Mode
 
@@ -113,26 +105,12 @@ Check current partition mode for GPU 0:
 sudo amd-smi partition -g 0
 ```
 
-<<<<<<< HEAD
-Omitting `-g 0` will show information for all GPUs, if needed
-
-#### Change to CPX Mode
-
-=======
 Change to CPX mode (if necessary):
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 ```bash
 sudo amd-smi set -C cpx
 ```
 
-<<<<<<< HEAD
-#### Change back to SPX Mode
-
-Use the command below to change back to `SPX` partitioning mode when you are done.
-
-=======
 Change back to SPX mode (if needed later):
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 ```bash
 sudo amd-smi set -C spx
 ```
@@ -141,28 +119,16 @@ For more details, refer to the [AMD ROCm documentation](https://rocm.docs.amd.co
 
 ## Getting Started
 
-<<<<<<< HEAD
-### Configure Environment
-=======
 ### 1. Configure Environment
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 Copy and edit the environment file:
 ```bash
 cp env.example .env
 ```
 
-<<<<<<< HEAD
-### Download Models
-  
-Ensure the models specified in `models.yaml` are downloaded to the directorie specified in your `.env` file. Models can be downloaded with `huggingface-cli`.
-
-### Run Services
-=======
 Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
 
 ### 2. Download Models
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 Ensure the models specified in `models.yaml` are downloaded to the directories configured in your `.env` file.
 
@@ -175,21 +141,6 @@ docker compose up -d
 
 This will start all services and run them in the background. The `depends_on` configurations ensure that services start in the correct order.
 
-<<<<<<< HEAD
-**NOTE:** It may take several minutes for all services to start. If any services fail to start, run `docker compose up -d` again.
-
-### View Service Status
-
-Use this command to view service status. All inference servers should show a status of `healthy`.
-
-```bash
-docker compose ps
-```
-
-### View Logs
-
-View logs for a specific service:
-=======
 ### 4. Access Interfaces
 
 - **Status Dashboard**: http://localhost:8080
@@ -198,23 +149,12 @@ View logs for a specific service:
 - **LiteLLM API**: http://localhost:4000
 
 ### 5. Monitor Logs
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ```bash
 docker compose logs -f <service_name>  # e.g., docker compose logs -f proxy
 ```
 
-<<<<<<< HEAD
-View all logs:
-
-```bash
-docker compose logs -f
-```
-
-### Stop Services
-=======
 ### 6. Stop Services
->>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ```bash
 docker compose down
