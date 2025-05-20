@@ -9,7 +9,7 @@ This demo was originally presented at [AI Infra Summit 3](https://aiinfra.live) 
 ## Key Features
 
 - **Multi-Model Deployment**: Deploy multiple models of different sizes and architectures simultaneously
-- **GPU Partitioning**: Efficient utilization of AMD Instinct GPUs using Compute Partition (CPX) mode
+- **GPU Partitioning**: Efficient utilization of AMD Instinct GPUs CPX partition mode (8 Logical GPUs per Pyhsical GPU)
 - **Unified API**: Single OpenAI-compatible endpoint for accessing all models through LiteLLM proxy
 - **Multiple Inference Engines**: Support for vLLM and SGLang to optimize for different model architectures
 - **Real-time Monitoring**: Status dashboard showing deployed models and GPU VRAM utilization
@@ -96,7 +96,7 @@ The system uses the following TCP ports:
 
 ## GPU Partitioning Setup
 
-This demo leverages AMD GPU partitioning and requires the GPU to be in **CPX Partitioning** mode to run several models concurrently.
+This demo leverages AMD GPU partitioning and requires the GPU to be in **CPX Partition** mode to run several models concurrently.
 
 ### Checking and Setting Partition Mode
 
@@ -106,7 +106,7 @@ Check current partition mode for GPU 0:
 sudo amd-smi partition -g 0
 ```
 
-If the GPU is in SPX partitiong mode, change to CPX mode:
+If the GPU is in SPX partition mode, change to CPX mode:
 
 ```bash
 sudo amd-smi set -C cpx
