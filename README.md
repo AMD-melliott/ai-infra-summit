@@ -64,7 +64,7 @@ The demo is made up of these components:
 
 ## Default Models
 
-The system comes pre-configured with the following models:
+The following models are pre-configured:
 
 | Model | Type | Server | GPU Partitions |
 |-------|------|--------|----------------|
@@ -82,7 +82,7 @@ The system comes pre-configured with the following models:
 
 ## Port Usage
 
-The system uses the following TCP ports:
+This demo uses the following TCP ports:
 
 | Service | Port Range |
 |---------|------------|
@@ -242,8 +242,8 @@ docker compose down
 
 Want to add your own models? It's easy:
 
-1. Add your model's details to the `models.yaml` file
-2. Download the model to your models directory
+1. Download the model to your models directory
+2. Add your model's details to the `models.yaml` file
 3. Edit `docker-compose.vllm.yaml` and/or `docker-compose.sglang.yaml` as needed
 4. Bring up the new models with `docker compose up -d`
 4. Restart the proxy with `docker compose restart proxy`
