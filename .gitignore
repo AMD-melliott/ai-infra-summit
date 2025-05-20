@@ -1,3 +1,4 @@
 .env
 *.db
 /monitoring/grafana/*/
+open-webui/

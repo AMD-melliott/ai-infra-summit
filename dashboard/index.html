@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Infra Demo Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons (optional, but often used with Bootstrap) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { padding-top: 20px; background-color: #f8f9fa; }
+        .card { margin-bottom: 20px; }
+        .metric-value { font-size: 1.5rem; font-weight: bold; }
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        
+        /* Simple GPU Partition Styling */
+        .gpu-visualization { display: flex; justify-content: space-around; align-items: center; background: #e9ecef; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .gpu-partition { border: 1px solid #adb5bd; padding: 15px; text-align: center; border-radius: 5px; background-color: #fff; width: 22%; transition: opacity 0.5s ease-in-out; }
+        .partition-label { font-weight: bold; margin-bottom: 5px; }
+        .partition-detail { font-size: 0.9em; color: #6c757d; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4 text-center">AMD Instinct Model Serving Swiss Army Knife</h1>
+
+        <!-- Service Links (Placeholder) -->
+        <div class="service-links text-center mb-4">
+            <a href="/load-generator/" class="btn btn-primary me-2">Load Generator</a>
+            <a href="http://localhost:8081" class="btn btn-secondary me-2">Open WebUI</a>
+        </div>
+
+        <!-- Error Message Display -->
+        <div id="metrics-error-message" class="alert alert-danger" style="display: none;">Failed to load metrics.</div>
+
+        <!-- Overall System Summary Section -->
+        <div class="card mb-4">
+            <div class="card-header">Overall System Summary</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Total VRAM Available</h5>
+                        <p class="metric-value"><span id="total-vram-available">--</span> GB</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Total VRAM Used</h5>
+                        <p class="metric-value"><span id="total-vram-used">--</span> GB</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Total VRAM Free</h5>
+                        <p class="metric-value"><span id="total-vram-free">--</span> GB</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- vLLM Service Metrics Section -->
+        <div class="card mb-4">
+            <div class="card-header">vLLM Service Metrics</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Running Requests</h5>
+                        <p class="metric-value"><span id="vllm-requests-running">--</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Waiting Requests</h5>
+                        <p class="metric-value"><span id="vllm-requests-waiting">--</span></p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>KV Cache Usage</h5>
+                        <p class="metric-value"><span id="vllm-kv-cache-usage">--</span>%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Partition Memory Usage Section -->
+        <div class="card mb-4">
+            <div class="card-header">GPU Partition Layout</div>
+            <div class="card-body">
+                <div id="partition-usage-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+                    <!-- Partition usage will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+    </div> 
+
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Your Dashboard JS - MOVED TO END OF BODY -->
+    <!-- <script src="dashboard.js"></script> -->
+</body>
+<script src="dashboard.js"></script>
+</html>

@@ -2,139 +2,180 @@
 
 ## Overview
 
-This repository contains the files needed to replicate the demo presented at [AI Infra Summit 3](https://aiinfra.live) on 5/3/25. It includes configurations for different inference servers (like vLLM and SGLang) and a load generator to demonstate a requests to the various models.
+This repository contains the files needed to set up a comprehensive model serving platform on AMD Instinct GPUs. The project leverages GPU partitioning for efficient resource utilization and deploys multiple inference servers to handle various model types through a unified API.
+
+This demo was originally presented at [AI Infra Summit 3](https://aiinfra.live) on May 3, 2025.
+
+## Key Features
+
+- **Multi-Model Deployment**: Deploy multiple models of different sizes and architectures simultaneously
+- **GPU Partitioning**: Efficient utilization of AMD Instinct GPUs using Compute Partition (CPX) mode
+- **Unified API**: Single OpenAI-compatible endpoint for accessing all models through LiteLLM proxy
+- **Multiple Inference Engines**: Support for vLLM and SGLang to optimize for different model architectures
+- **Real-time Monitoring**: Status dashboard showing deployed models and GPU VRAM utilization
+- **Interactive UI**: Web interface for testing models and generating loads
+- **Load Testing**: Built-in tools to simulate workloads and test scaling
+
+### Screenshots
+
+<div align="center">
+
+![Metrics Dashboard](images/dashboard.png)
+*Metrics Dashboard*
+
+</div>
+<p>
+<div align="center">
+
+![Load Generator UI](images/load-gen.png)
+*Demo Load Generator UI*
+
+</div>
 
 **Many thanks** to [Vultr](https://www.vultr.com/) for providing an AMD Instinct MI325X bare metal instace to build and host this demo. Find more information about Vultr's Instinct-based offerings here: [https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/](https://www.vultr.com/products/cloud-gpu/amd-mi325x-mi300x/)
 
 ## Prerequisites
 
-* **AMD Instinct™ GPU:** This demo is configured for AMD Instinct GPUs. Ensure you have the [necessary drivers installed](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html).
+* **AMD Instinct™ GPU**: This demo is designed for AMD Instinct GPUs. Ensure you have the [necessary drivers installed](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/quick-start.html).
 * Docker and Docker Compose installed.
 * Hugging Face Hub token (if downloading private models).
 
-**Note:** This setup utilizes `network_mode: host` in the Docker Compose configurations. This means the containers share the host's network stack, which simplifies networking between containers but has security implications and might not be suitable for all environments. Ensure you understand the consequences before deploying in production.
+> **Note:** This setup utilizes `network_mode: host` in the Docker Compose configurations. This means the containers share the host's network stack, which simplifies networking between containers but has security implications. Ensure you understand the consequences before deploying in production.
 
-## Components
+## Architecture
 
-This repository deploys the following services via Docker Compose:
+The platform consists of the following components:
 
-* **vLLM Instances:** Multiple instances of the vLLM inference server, each potentially serving a different model or configuration, targeting specific GPU partitions. See `docker-compose.vllm.yaml`.
-* **SGLang Instances:** Multiple instances of the SGLang inference server, similar to vLLM, for structured generation tasks. See `docker-compose.sglang.yaml`.
-* **LiteLLM Proxy:** A proxy service (`proxy` in `docker-compose.litellm.yaml`) that provides a unified OpenAI-compatible API endpoint. It routes incoming requests to the appropriate backend inference server (vLLM or SGLang instances) based on the model requested. Configuration is managed via `models.yaml`.
-* **Load Generator:** A simple Python script (`load-generator` in `docker-compose.load-generator.yaml`) to send requests to the LiteLLM proxy to simulate a typical workload.
+* **vLLM Instances**: Multiple instances serving various models, each targeting specific GPU partitions
+* **SGLang Instances**: Additional inference servers optimized for certain model architectures
+* **LiteLLM Proxy**: Unified API endpoint that routes requests to appropriate backend servers
+* **Open WebUI**: Interactive interface for testing models
+* **Status Dashboard**: Real-time monitoring of models and GPU utilization
+* **Load Generator**: Tool for simulating workloads and testing performance
 
-## Default Models (`models.yaml`)
+### Logical Diagram
 
-The `models.yaml` file configures the LiteLLM proxy, defining which backend inference server serves which model name. By default, it includes configurations for various models across the vLLM and SGLang instances, such as:
+<div align="center">
 
-* [Qwen/Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B) (vLLM)
-* [Qwen/Qwen2.5-7B](https://huggingface.co/Qwen/Qwen2.5-7B) (vLLM)
-* [microsoft/Phi-4-mini-instruct](https://huggingface.co/microsoft/Phi-4-mini-instruct) (vLLM)
-* [mistralai/Mistral-Nemo-Instruct-FP8-2407](https://huggingface.co/mistralai/Mistral-Nemo-Instruct-FP8-2407) (vLLM)
-* [BAAI/bge-large-en-v1.5](https://huggingface.co/BAAI/bge-large-en-v1.5) (Embedding, vLLM)
-* [BAAI/bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3) (Reranker, vLLM)
-* [Qwen/Qwen3-14B](https://huggingface.co/Qwen/Qwen3-14B) (SGLang)
+![Load Generator UI](images/swiss-army-knife.png)
+*Logical Diagram*
 
-Each entry maps a model name requested via the proxy to the specific `api_base` (the URL of the backend vLLM/SGLang instance) that serves it.
+</div>
 
-## Logical Diagram
 
-```mermaid
-graph TD
-    LG[Load Generator] --> LB[LiteLLM Proxy<br>Load Balancer]
-    
-    subgraph "Model Servers"
-        subgraph "vLLM Models"
-            V1[vLLM Models 0-3<br>Qwen3-4B]
-            V2[vLLM Models 4-7<br>Qwen2.5-7B]
-            V3[vLLM Models 8-11<br>Phi-4-mini-instruct]
-            V4[vLLM Models 12-15<br>Mistral-Nemo]
-            V5[vLLM Models 16-19<br>BGE Embeddings]
-            V6[vLLM Models 20-23<br>BGE Reranker]
-        end
-        
-        subgraph "SGLang Models"
-            S1[SGLang Models 0-3<br>Qwen3-14B]
-        end
-    end
-    
-    LB --> V1
-    LB --> V2
-    LB --> V3
-    LB --> V4
-    LB --> V5
-    LB --> V6
-    LB --> S1
+## Default Models
 
-    style LG fill:#f9f,stroke:#333,stroke-width:2px
-    style LB fill:#bbf,stroke:#333,stroke-width:2px
-    style V1 fill:#dfd,stroke:#333,stroke-width:1px
-    style V2 fill:#dfd,stroke:#333,stroke-width:1px
-    style V3 fill:#dfd,stroke:#333,stroke-width:1px
-    style V4 fill:#dfd,stroke:#333,stroke-width:1px
-    style V5 fill:#dfd,stroke:#333,stroke-width:1px
-    style V6 fill:#dfd,stroke:#333,stroke-width:1px
-    style S1 fill:#fdd,stroke:#333,stroke-width:1px
-```
+The system comes pre-configured with the following models:
 
-## GPU Partitioning
+| Model | Type | Server | GPU Partitions |
+|-------|------|--------|----------------|
+| [Qwen/Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B) | LLM | vLLM | 0-3 |
+| [Qwen/Qwen2.5-7B](https://huggingface.co/Qwen/Qwen2.5-7B) | LLM | vLLM | 4-7 |
+| [microsoft/Phi-4-mini-instruct](https://huggingface.co/microsoft/Phi-4-mini-instruct) | LLM | vLLM | 8-11 |
+| [mistralai/Mistral-Nemo-Instruct-FP8-2407](https://huggingface.co/mistralai/Mistral-Nemo-Instruct-FP8-2407) | LLM | vLLM | 12-15 |
+| [BAAI/bge-large-en-v1.5](https://huggingface.co/BAAI/bge-large-en-v1.5) | Embedding | vLLM | 16-19 |
+| [BAAI/bge-reranker-v2-m3](https://huggingface.co/BAAI/bge-reranker-v2-m3) | Reranker | vLLM | 20-23 |
+| [google/gemma-3-4B-it](https://huggingface.co/google/gemma-3-4B-it) | LLM | vLLM | 32-35 |
+| [meta-llama/Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct) | LLM | vLLM | 36-39 |
+| [CohereLabs/c4ai-command-r7b-12-2024](https://huggingface.co/CohereLabs/c4ai-command-r7b-12-2024) | LLM | vLLM | 40-43 |
+| [Qwen/Qwen3-4B](https://huggingface.co/Qwen/Qwen3-4B) | LLM | SGLang | 24-27 |
+| [meta-llama/Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct) | LLM | SGLang | 28-31 |
 
-This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute Partition (CPX)** mode.
+## Port Usage
 
-* **SPX (Single Partition):** The default mode where the entire GPU is treated as a single unit.
-* **CPX (Compute Partition):** Divides the GPU into multiple compute partitions (virtual GPUs), each with dedicated compute units and a portion of the HBM memory. This allows multiple independent workloads to run concurrently on a single physical GPU. This demo assumes CPX mode is enabled to run multiple model instances efficiently.
+The system uses the following TCP ports:
+
+<<<<<<< HEAD
+### Checking and Setting Partition Mode
+=======
+| Service | Port Range |
+|---------|------------|
+| vLLM Servers | 8000-8023, 8032-8043 |
+| SGLang Servers | 9101-9108 |
+| LiteLLM Proxy | 4000 |
+| Open WebUI | 8081 |
+| Metrics Aggregator | 5001 |
+| Load Generator | 5002 |
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
+
+## GPU Partitioning Setup
+
+<<<<<<< HEAD
+#### Check Current Mode
+=======
+This demo leverages AMD GPU partitioning and requires the GPU to be in **Compute Partition (CPX)** mode to run multiple model instances efficiently.
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ### Checking and Setting Partition Mode
 
-You can use the `amd-smi` tool (part of the ROCm installation) to manage partitioning.
-
-#### Check Current Mode
-
-Run this command to view the partition mode for GPU 0. All GPUs in the system are partitioned in the same mode, so if GPU 0 is in CPX mode, all GPUs are in CPX mode
-
+Check current partition mode for GPU 0:
 ```bash
 sudo amd-smi partition -g 0
 ```
 
+<<<<<<< HEAD
 Omitting `-g 0` will show information for all GPUs, if needed
 
 #### Change to CPX Mode
 
+=======
+Change to CPX mode (if necessary):
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 ```bash
 sudo amd-smi set -C cpx
 ```
 
+<<<<<<< HEAD
 #### Change back to SPX Mode
 
 Use the command below to change back to `SPX` partitioning mode when you are done.
 
+=======
+Change back to SPX mode (if needed later):
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 ```bash
 sudo amd-smi set -C spx
 ```
 
-Refer to the [AMD ROCm documentation](https://rocm.docs.amd.com/) and the [Compute and Memory Modes Blog Post](https://rocm.blogs.amd.com/software-tools-optimization/compute-memory-modes/README.html) for more details.
+For more details, refer to the [AMD ROCm documentation](https://rocm.docs.amd.com/) and the [Compute and Memory Modes Blog Post](https://rocm.blogs.amd.com/software-tools-optimization/compute-memory-modes/README.html).
 
-## Usage
+## Getting Started
 
+<<<<<<< HEAD
 ### Configure Environment
+=======
+### 1. Configure Environment
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
-* Copy the example environment file: `cp env.example .env`
-* Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
+Copy and edit the environment file:
+```bash
+cp env.example .env
+```
 
+<<<<<<< HEAD
 ### Download Models
   
 Ensure the models specified in `models.yaml` are downloaded to the directorie specified in your `.env` file. Models can be downloaded with `huggingface-cli`.
 
 ### Run Services
+=======
+Edit the `.env` file to set the correct paths for your model cache and model storage directories. You may also need to add your `HUGGING_FACE_HUB_TOKEN`.
 
-To start all services (vLLM, SGLang, LiteLLM Proxy, Load Generator) defined in the Compose files, simply run:
+### 2. Download Models
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
+Ensure the models specified in `models.yaml` are downloaded to the directories configured in your `.env` file.
+
+### 3. Start Services
+
+Launch all services with Docker Compose:
 ```bash
 docker compose up -d
 ```
 
-This command will start all services and detach, running them in the background. The `depends_on` configurations within the Compose files ensure that services start in the correct order and wait for dependencies to become healthy.
+This will start all services and run them in the background. The `depends_on` configurations ensure that services start in the correct order.
 
+<<<<<<< HEAD
 **NOTE:** It may take several minutes for all services to start. If any services fail to start, run `docker compose up -d` again.
 
 ### View Service Status
@@ -148,11 +189,22 @@ docker compose ps
 ### View Logs
 
 View logs for a specific service:
+=======
+### 4. Access Interfaces
+
+- **Status Dashboard**: http://localhost:8080
+- **Open WebUI**: http://localhost:8081
+- **Load Generator**: http://localhost:8080/load-generator/
+- **LiteLLM API**: http://localhost:4000
+
+### 5. Monitor Logs
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ```bash
-docker compose logs -f <service_name> # e.g., docker compose logs -f proxy
+docker compose logs -f <service_name>  # e.g., docker compose logs -f proxy
 ```
 
+<<<<<<< HEAD
 View all logs:
 
 ```bash
@@ -160,7 +212,44 @@ docker compose logs -f
 ```
 
 ### Stop Services
+=======
+### 6. Stop Services
+>>>>>>> 5cc0b92 (Updated instructions, updated vLLM and SGlang services, added nginx, dashboard, metrics agg. and open webui)
 
 ```bash
 docker compose down
 ```
+
+## Customization
+
+### Adding New Models
+
+To add new models:
+
+1. Update the `models.yaml` file with your model configuration
+2. Ensure the model is accessible in your model storage path
+3. Restart the services with `docker compose restart proxy`
+
+### Scaling Resources
+
+Adjust the GPU partitioning in the Docker Compose files to allocate more or fewer resources to specific models based on your requirements.
+
+## Troubleshooting
+
+- **GPU Not Found**: Ensure ROCm drivers are properly installed and the GPU is in CPX mode
+- **Model Loading Failures**: Check model paths and verify Hugging Face token permissions
+- **Port Conflicts**: Ensure the required ports are available on your system
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- AMD ROCm Team for enabling GPU partitioning capabilities
+- vLLM, SGLang, and LiteLLM projects for their excellent model serving frameworks
+- All contributors to the open-source models used in this demo

@@ -1,10 +1,10 @@
-x-devices: &devices
+x-vllm-devices: &vllm-devices
     devices:
         - /dev/kfd
         - /dev/dri
     group_add:
         - video
-x-defaults: &defaults
+x-vllm-defaults: &vllm-defaults
     security_opt:
         - seccomp:unconfined
     ipc: "host"
@@ -24,420 +24,654 @@ x-defaults: &defaults
 services:
   # Qwen3-4B Group (GPUs 0-3)
   vllm-model0:
-    <<: [*defaults, *devices]  
+    <<: [*vllm-defaults, *vllm-devices]  
     image: $VLLM_IMAGE
     container_name: vllm-model0
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8000
     network_mode: host
     environment:
-      HIP_VISIBLE_DEVICES: "0"
+      ROCR_VISIBLE_DEVICES: "0"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model1:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model1
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8001
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "1"
+      ROCR_VISIBLE_DEVICES: "1"
     depends_on:
       vllm-model0:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model2:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model2
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8002
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "2"
+      ROCR_VISIBLE_DEVICES: "2"
     depends_on:
       vllm-model1:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model3:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model3
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen3-4B --trust-remote-code --chat-template-content-format string --enable-reasoning --reasoning-parser deepseek_r1 --port 8003
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "3"
+      ROCR_VISIBLE_DEVICES: "3"
     depends_on:
       vllm-model2:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   # Qwen2.5-7B Group (GPUs 4-7)
   vllm-model4:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model4
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8004
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "4"
+      ROCR_VISIBLE_DEVICES: "4"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model5:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model5
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8005
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "5"
+      ROCR_VISIBLE_DEVICES: "5"
     depends_on:
       vllm-model4:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model6:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model6
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8006
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "6"
+      ROCR_VISIBLE_DEVICES: "6"
     depends_on:
       vllm-model5:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model7:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model7
     command: python -m vllm.entrypoints.openai.api_server --model Qwen/Qwen2.5-7B --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8007
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "7"
+      ROCR_VISIBLE_DEVICES: "7"
     depends_on:
       vllm-model6:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   # Phi-4-mini Group (GPUs 8-11)
   vllm-model8:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model8
     command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8008
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "8"
+      ROCR_VISIBLE_DEVICES: "8"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model9:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model9
     command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8009
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "9"
+      ROCR_VISIBLE_DEVICES: "9"
     depends_on:
       vllm-model8:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model10:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model10
     command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8010
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "10"
+      ROCR_VISIBLE_DEVICES: "10"
     depends_on:
       vllm-model9:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model11:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model11
     command: python -m vllm.entrypoints.openai.api_server --model microsoft/Phi-4-mini-instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8011
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "11"
+      ROCR_VISIBLE_DEVICES: "11"
     depends_on:
       vllm-model10:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   # Mistral-Nemo Group (GPUs 12-15)
   vllm-model12:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model12
     command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8012
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "12"
+      ROCR_VISIBLE_DEVICES: "12"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8012/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model13:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model13
     command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8013
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "13"
+      ROCR_VISIBLE_DEVICES: "13"
     depends_on:
       vllm-model12:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model14:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model14
     command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8014
     network_mode: host 
     environment:
-      HIP_VISIBLE_DEVICES: "14"
+      ROCR_VISIBLE_DEVICES: "14"
     depends_on:
       vllm-model13:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8014/health"] 
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model15:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model15
     command: python -m vllm.entrypoints.openai.api_server --model mistralai/Mistral-Nemo-Instruct-FP8-2407 --gpu-memory-utilization 1 --max-model-len 8096 --trust-remote-code --chat-template /app/vllm/examples/tool_chat_template_mistral.jinja --tokenizer-mode mistral --port 8015
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "15"
+      ROCR_VISIBLE_DEVICES: "15"
     depends_on:
       vllm-model14:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8015/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   # BGE Embeddings Group (GPUs 16-19)
   vllm-model16:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model16
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8016
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "16"
+      ROCR_VISIBLE_DEVICES: "16"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8016/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model17:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model17
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8017
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "17"
+      ROCR_VISIBLE_DEVICES: "17"
     depends_on:
       vllm-model16:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8017/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model18:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model18
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8018
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "18"
+      ROCR_VISIBLE_DEVICES: "18"
     depends_on:
       vllm-model17:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8018/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model19:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model19
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-large-en-v1.5 --task embedding --port 8019
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "19"
+      ROCR_VISIBLE_DEVICES: "19"
     depends_on:
       vllm-model18:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8019/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   # BGE Reranker Group (GPUs 20-23)
   vllm-model20:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model20
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8020
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "20"
+      ROCR_VISIBLE_DEVICES: "20"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8020/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model21:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model21
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8021
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "21"
+      ROCR_VISIBLE_DEVICES: "21"
     depends_on:
       vllm-model20:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8021/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model22:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model22
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8022
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "22"
+      ROCR_VISIBLE_DEVICES: "22"
     depends_on:
       vllm-model21:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8022/health"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
       start_period: 90s
 
   vllm-model23:
-    <<: [*defaults, *devices]
+    <<: [*vllm-defaults, *vllm-devices]
     image: $VLLM_IMAGE
     container_name: vllm-model23
     command: python -m vllm.entrypoints.openai.api_server --model BAAI/bge-reranker-v2-m3 --port 8023
     network_mode: host 
     environment:  
-      HIP_VISIBLE_DEVICES: "23"
+      ROCR_VISIBLE_DEVICES: "23"
     depends_on:
       vllm-model22:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8023/health"] 
-      interval: 30s
+      interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
+      start_period: 90s
+
+# Partitions 32-35: google/gemma-3-4B-it
+  vllm-model32:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model32
+    command: python -m vllm.entrypoints.openai.api_server --model google/gemma-3-4B-it --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8032
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "32"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8032/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model33:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model33
+    command: python -m vllm.entrypoints.openai.api_server --model google/gemma-3-4B-it --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8033
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "33"
+    depends_on:
+      vllm-model32:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8033/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model34:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model34
+    command: python -m vllm.entrypoints.openai.api_server --model google/gemma-3-4B-it --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8034
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "34"
+    depends_on:
+      vllm-model33:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8034/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model35:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model35
+    command: python -m vllm.entrypoints.openai.api_server --model google/gemma-3-4B-it --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8035
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "35"
+    depends_on:
+      vllm-model34:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8035/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  # Partitions 36-39: meta-llama/Llama-3.2-3B-Instruct
+  vllm-model36:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model36
+    command: python -m vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8036
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "36"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8036/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model37:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model37
+    command: python -m vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8037
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "37"
+    depends_on:
+      vllm-model36:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8037/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model38:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model38
+    command: python -m vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8038
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "38"
+    depends_on:
+      vllm-model37:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8038/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model39:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model39
+    command: python -m vllm.entrypoints.openai.api_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --chat-template-content-format string --max-model-len 16384 --port 8039
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "39"
+    depends_on:
+      vllm-model38:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8039/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  # Partitions 40-43: CohereLabs/c4ai-command-r7b-12-2024
+  vllm-model40:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model40
+    command: python -m vllm.entrypoints.openai.api_server --model CohereLabs/c4ai-command-r7b-12-2024 --trust-remote-code --chat-template-content-format string --max-model-len 8192 --port 8040
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "40"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8040/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model41:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model41
+    command: python -m vllm.entrypoints.openai.api_server --model CohereLabs/c4ai-command-r7b-12-2024 --trust-remote-code --chat-template-content-format string --max-model-len 8192 --port 8041
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "41"
+    depends_on:
+      vllm-model40:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8041/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model42:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model42
+    command: python -m vllm.entrypoints.openai.api_server --model CohereLabs/c4ai-command-r7b-12-2024 --trust-remote-code --chat-template-content-format string --max-model-len 8192 --port 8042
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "42"
+    depends_on:
+      vllm-model41:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8042/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+
+  vllm-model43:
+    <<: [*vllm-defaults, *vllm-devices]
+    image: $VLLM_IMAGE
+    container_name: vllm-model43
+    command: python -m vllm.entrypoints.openai.api_server --model CohereLabs/c4ai-command-r7b-12-2024 --trust-remote-code --chat-template-content-format string --max-model-len 8192 --port 8043
+    network_mode: host
+    environment:
+      ROCR_VISIBLE_DEVICES: "43"
+    depends_on:
+      vllm-model42:
+        condition: service_healthy
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8043/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
       start_period: 90s

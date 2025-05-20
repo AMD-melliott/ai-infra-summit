@@ -125,31 +125,106 @@ model_list:
       model: openai/BAAI/bge-reranker-v2-m3
       api_base: http://localhost:8023/v1
 
-  # Partitions 24-31: SGLang Qwen/Qwen3-14B
-  - model_name: Qwen/Qwen3-14B
+  # Partitions 24-27: SGLang Qwen/Qwen3-4B
+  - model_name: Qwen/Qwen3-4B
     litellm_params:
-      model: openai/Qwen/Qwen3-14B
-      api_base: http://localhost:9000/v1
+      model: openai/Qwen/Qwen3-4B
+      api_base: http://localhost:9101/v1
 
-  - model_name: Qwen/Qwen3-14B
+  - model_name: Qwen/Qwen3-4B
     litellm_params:
-      model: openai/Qwen/Qwen3-14B
-      api_base: http://localhost:9001/v1
+      model: openai/Qwen/Qwen3-4B
+      api_base: http://localhost:9102/v1
 
-  - model_name: Qwen/Qwen3-14B
+  - model_name: Qwen/Qwen3-4B
     litellm_params:
-      model: openai/Qwen/Qwen3-14B
-      api_base: http://localhost:9002/v1
+      model: openai/Qwen/Qwen3-4B
+      api_base: http://localhost:9103/v1
 
-  - model_name: Qwen/Qwen3-14B
+  - model_name: Qwen/Qwen3-4B
     litellm_params:
-      model: openai/Qwen/Qwen3-14B
-      api_base: http://localhost:9003/v1
+      model: openai/Qwen/Qwen3-4B
+      api_base: http://localhost:9104/v1
 
-  # Partition 16: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
-  # - model_name: deepseek-ai/DeepSeek-R1-Distill-Llama-70B
-  #   litellm_params:
-  #     model: openai/deepseek-ai/DeepSeek-R1-Distill-Llama-70B
-  #     api_base: http://localhost:9000/v1
+  # Partitions 28-31: SGLang meta-llama/Llama-3.2-3B-Instruct
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:9105/v1
+
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:9106/v1
+
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:9107/v1
+
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:9108/v1
+
+# Partitions 32-36: vLLM google/gemma-3-4B-it
+  - model_name: google/gemma-3-4B-it
+    litellm_params:
+      model: openai/google/gemma-3-4B-it
+      api_base: http://localhost:8032/v1
+
+  - model_name: google/gemma-3-4B-it
+    litellm_params:
+      model: openai/google/gemma-3-4B-it
+      api_base: http://localhost:8033/v1
+
+  - model_name: google/gemma-3-4B-it
+    litellm_params:
+      model: openai/google/gemma-3-4B-it
+      api_base: http://localhost:8034/v1
+
+  - model_name: google/gemma-3-4B-it
+    litellm_params:
+      model: openai/google/gemma-3-4B-it
+      api_base: http://localhost:8035/v1
+
+# Partitions 36-39: vLLM meta-llama/Llama-3.2-3B-Instruct
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:8036/v1
+
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:8037/v1
       
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:8038/v1
       
+  - model_name: meta-llama/Llama-3.2-3B-Instruct
+    litellm_params:
+      model: openai/meta-llama/Llama-3.2-3B-Instruct
+      api_base: http://localhost:8039/v1
+
+  # Partitions 40-43: CohereLabs/c4ai-command-r7b-12-2024
+  - model_name: CohereLabs/c4ai-command-r7b-12-2024
+    litellm_params:
+      model: openai/CohereLabs/c4ai-command-r7b-12-2024
+      api_base: http://localhost:8040/v1
+
+  - model_name: CohereLabs/c4ai-command-r7b-12-2024
+    litellm_params:
+      model: openai/CohereLabs/c4ai-command-r7b-12-2024
+      api_base: http://localhost:8041/v1
+
+  - model_name: CohereLabs/c4ai-command-r7b-12-2024
+    litellm_params:
+      model: openai/CohereLabs/c4ai-command-r7b-12-2024
+      api_base: http://localhost:8042/v1
+
+  - model_name: CohereLabs/c4ai-command-r7b-12-2024
+    litellm_params:
+      model: openai/CohereLabs/c4ai-command-r7b-12-2024

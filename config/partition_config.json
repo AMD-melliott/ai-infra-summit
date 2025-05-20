@@ -1,0 +1,338 @@
+{
+  "0": {
+    "name": "Qwen3-4B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8000/metrics",
+    "bg_color": "#AED6F1"
+  },
+  "1": {
+    "name": "Qwen3-4B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8001/metrics",
+    "bg_color": "#AED6F1"
+  },
+  "2": {
+    "name": "Qwen3-4B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8002/metrics",
+    "bg_color": "#AED6F1"
+  },
+  "3": {
+    "name": "Qwen3-4B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8003/metrics",
+    "bg_color": "#AED6F1"
+  },
+  "4": {
+    "name": "Qwen2.5-7B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8004/metrics",
+    "bg_color": "#7DCEA0"
+  },
+  "5": {
+    "name": "Qwen2.5-7B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8005/metrics",
+    "bg_color": "#7DCEA0"
+  },
+  "6": {
+    "name": "Qwen2.5-7B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8006/metrics",
+    "bg_color": "#7DCEA0"
+  },
+  "7": {
+    "name": "Qwen2.5-7B",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8007/metrics",
+    "bg_color": "#7DCEA0"
+  },
+  "8": {
+    "name": "Phi-4-mini-instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8008/metrics",
+    "bg_color": "#D2B4DE"
+  },
+  "9": {
+    "name": "Phi-4-mini-instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8009/metrics",
+    "bg_color": "#D2B4DE"
+  },
+  "10": {
+    "name": "Phi-4-mini-instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8010/metrics",
+    "bg_color": "#D2B4DE"
+  },
+  "11": {
+    "name": "Phi-4-mini-instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8011/metrics",
+    "bg_color": "#D2B4DE"
+  },
+  "12": {
+    "name": "Mistral-Nemo-Instruct-FP8",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8012/metrics",
+    "bg_color": "#F5CBA7"
+  },
+  "13": {
+    "name": "Mistral-Nemo-Instruct-FP8",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8013/metrics",
+    "bg_color": "#F5CBA7"
+  },
+  "14": {
+    "name": "Mistral-Nemo-Instruct-FP8",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8014/metrics",
+    "bg_color": "#F5CBA7"
+  },
+  "15": {
+    "name": "Mistral-Nemo-Instruct-FP8",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8015/metrics",
+    "bg_color": "#F5CBA7"
+  },
+  "16": {
+    "name": "bge-large-en-v1.5",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8016/metrics",
+    "bg_color": "#BFC9CA"
+  },
+  "17": {
+    "name": "bge-large-en-v1.5",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8017/metrics",
+    "bg_color": "#BFC9CA"
+  },
+  "18": {
+    "name": "bge-large-en-v1.5",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8018/metrics",
+    "bg_color": "#BFC9CA"
+  },
+  "19": {
+    "name": "bge-large-en-v1.5",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8019/metrics",
+    "bg_color": "#BFC9CA"
+  },
+  "20": {
+    "name": "bge-reranker-v2-m3",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8020/metrics",
+    "bg_color": "#FAD7A0"
+  },
+  "21": {
+    "name": "bge-reranker-v2-m3",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8021/metrics",
+    "bg_color": "#FAD7A0"
+  },
+  "22": {
+    "name": "bge-reranker-v2-m3",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8022/metrics",
+    "bg_color": "#FAD7A0"
+  },
+  "23": {
+    "name": "bge-reranker-v2-m3",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8023/metrics",
+    "bg_color": "#FAD7A0"
+  },
+  "24": {
+    "name": "Qwen3-4B",
+    "service_type": "sglang",
+    "bg_color": "#A9CCE3"
+  },
+  "25": {
+    "name": "Qwen3-4B",
+    "service_type": "sglang",
+    "bg_color": "#A9CCE3"
+  },
+  "26": {
+    "name": "Qwen3-4B",
+    "service_type": "sglang",
+    "bg_color": "#A9CCE3"
+  },
+  "27": {
+    "name": "Qwen3-4B",
+    "service_type": "sglang",
+    "bg_color": "#A9CCE3"
+  },
+  "28": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "sglang",
+    "bg_color": "#FFC0CB"
+  },
+  "29": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "sglang",
+    "bg_color": "#FFC0CB"
+  },
+  "30": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "sglang",
+    "bg_color": "#FFC0CB"
+  },
+  "31": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "sglang",
+    "bg_color": "#FFC0CB"
+  },
+  "32": {
+    "name": "gemma-3-4B-it",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8032/metrics",
+    "bg_color": "#A3E4D7"
+  },
+  "33": {
+    "name": "gemma-3-4B-it",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8033/metrics",
+    "bg_color": "#A3E4D7"
+  },
+  "34": {
+    "name": "gemma-3-4B-it",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8034/metrics",
+    "bg_color": "#A3E4D7"
+  },
+  "35": {
+    "name": "gemma-3-4B-it",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8035/metrics",
+    "bg_color": "#A3E4D7"
+  },
+  "36": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8036/metrics",
+    "bg_color": "#FFC0CB"
+  },
+  "37": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8037/metrics",
+    "bg_color": "#FFC0CB"
+  },
+  "38": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8038/metrics",
+    "bg_color": "#FFC0CB"
+  },
+  "39": {
+    "name": "Llama-3.2-3B-Instruct",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8039/metrics",
+    "bg_color": "#FFC0CB"
+  },
+  "40": {
+    "name": "c4ai-command-r7b-12-2024",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8040/metrics",
+    "bg_color": "#ADD8E6"
+  },
+  "41": {
+    "name": "c4ai-command-r7b-12-2024",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8041/metrics",
+    "bg_color": "#ADD8E6"
+  },
+  "42": {
+    "name": "c4ai-command-r7b-12-2024",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8042/metrics",
+    "bg_color": "#ADD8E6"
+  },
+  "43": {
+    "name": "c4ai-command-r7b-12-2024",
+    "service_type": "vllm",
+    "metrics_url": "http://localhost:8043/metrics",
+    "bg_color": "#ADD8E6"
+  },
+  "44": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "45": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "46": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "47": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "48": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "49": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "50": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "51": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "52": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "53": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "54": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "55": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "56": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "57": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "58": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "59": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "60": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "61": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "62": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  },
+  "63": {
+    "name": "Free Partition",
+    "bg_color": "#FFFFFF"
+  }
+} 

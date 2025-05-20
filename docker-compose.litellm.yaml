@@ -1,6 +1,7 @@
 services:
   proxy:
     image: litellm/litellm:latest
+    container_name: litellm
     network_mode: host
     command: [ "--config", "/app/config.yaml", "--port", "4000", "--num_workers", "8" ]
     restart: on-failure
@@ -8,11 +9,3 @@ services:
       - OPENAI_API_KEY="sk-1234"
     volumes:
       - ./models.yaml:/app/config.yaml
-    depends_on:
-      - vllm-model3  # Last Qwen3-4B model
-      - vllm-model7  # Last Qwen2.5-7B model
-      - vllm-model11 # Last Phi-4-mini model
-      - vllm-model15 # Last Mistral-Nemo model
-      - vllm-model19 # Last BGE Embeddings model
-      - vllm-model23 # Last BGE Reranker model
-      - sglang-03    # Last SGLang model

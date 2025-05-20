@@ -1,0 +1,23 @@
+services:
+  # Service to aggregate metrics for the dashboard
+  metrics-aggregator:
+    build: 
+      context: ./metrics-aggregator
+      dockerfile: Dockerfile
+      network: host
+    container_name: metrics-aggregator # Optional: Give it a consistent name
+    network_mode: host
+    privileged: true # Add privileged mode to allow GPU access
+    pid: "host" # Share host's PID namespace to see all processes
+    devices:
+        - /dev/kfd
+        - /dev/dri    
+    volumes:
+      - /lib/modules:/lib/modules:ro
+      - ./config/partition_config.json:/app/config/partition_config.json:ro
+    # Allow the container to load kernel modules if needed by amd-smi for partitioning
+    cap_add:
+      - SYS_MODULE
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1

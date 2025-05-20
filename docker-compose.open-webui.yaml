@@ -1,0 +1,21 @@
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    volumes:
+      - ./open-webui/data:/app/backend/data
+    env_file:
+      - .env
+    network_mode: host
+    environment:
+      ENABLE_OPENAI_API: "true"
+      OPENAI_API_BASE_URL: "http://localhost:4000"
+      OPENAI_API_KEY: "sk-1234"
+      ENABLE_OLLAMA_API: "false"
+      WEBUI_SECRET_KEY: "${WEBUI_SECRET_KEY}"
+      PORT: 8081
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

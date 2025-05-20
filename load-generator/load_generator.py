@@ -11,7 +11,7 @@ app = Flask(__name__)
 # --- Configuration ---
 LITELLM_ENDPOINT = "http://localhost:4000"
 API_KEY = "sk-1234" # Replace with your actual key if different
-MODELS_TO_USE = ["Qwen/Qwen3-4B", "Qwen/Qwen2.5-7B", "microsoft/Phi-4-mini-instruct", "mistralai/Mistral-Nemo-Instruct-FP8-2407"] # Models from models.yaml
+MODELS_TO_USE = ["Qwen/Qwen3-4B", "Qwen/Qwen2.5-7B", "microsoft/Phi-4-mini-instruct", "CohereLabs/c4ai-command-r7b-12-2024", "meta-llama/Llama-3.2-3B-Instruct", "mistralai/Mistral-Nemo-Instruct-FP8-2407"] # Models from models.yaml
 
 # --- Model Specific Configuration ---
 # Define EOS tokens for models (add more as needed)
@@ -22,9 +22,9 @@ MODEL_STOP_TOKENS = {
     "deepseek-ai/DeepSeek-R1-Distill-Llama-70B": ["<|eot_id|>"],
     "meta-llama/Llama-3.2-3B": ["<|eot_id|>"],
     "microsoft/Phi-4-mini-instruct": ["<|eot_id|>"],
-    "mistralai/Mistral-Nemo-Instruct-FP8-2407": ["<|eot_id|>"]
+    "mistralai/Mistral-Nemo-Instruct-FP8-2407": ["<|eot_id|>"],
     # Example for Llama:
-    # "meta-llama/Llama-3-8B-Instruct": ["<|eot_id|>", "</s>"], # Llama 3 uses <|eot_id|> but check specific tokenizer
+    "meta-llama/Llama-3.2-3B-Instruct": ["<|eot_id|>", "</s>"] # Llama 3 uses <|eot_id|> but check specific tokenizer
     # Example for Mistral:
     # "mistralai/Mistral-7B-Instruct-v0.1": ["</s>"]
 }

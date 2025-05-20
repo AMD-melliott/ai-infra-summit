@@ -6,7 +6,7 @@
     <title>LLM Trivia Load Generator</title>
     <style>
         body { font-family: sans-serif; line-height: 1.5; padding: 20px; max-width: 800px; margin: auto; background-color: #f9f9f9;}
-        #log { background-color: #fff; border: 1px solid #ddd; padding: 15px; height: 50vh; overflow-y: scroll; white-space: pre-wrap; font-family: monospace; font-size: 0.9em; border-radius: 4px; margin-top: 15px;}
+        #log { background-color: #fff; border: 1px solid #ddd; padding: 15px; height: 50vh; overflow-y: scroll; white-space: pre-wrap; font-family: monospace; font-size: 1.1em; border-radius: 4px; margin-top: 15px;}
         button { padding: 10px 15px; font-size: 1em; cursor: pointer; margin-right: 10px; border: none; border-radius: 4px; color: white;}
         #startButton { background-color: #28a745; }
         #startButton:disabled { background-color: #aaa; }
@@ -44,10 +44,8 @@
                 }
                 const logData = await response.json();
                 logElement.textContent = logData.join('\n');
-                // Scroll to the bottom only if the user hasn't scrolled up
-                if (logElement.scrollHeight - logElement.scrollTop <= logElement.clientHeight + 50) {
-                     logElement.scrollTop = logElement.scrollHeight;
-                }
+                // Always scroll to the bottom
+                logElement.scrollTop = logElement.scrollHeight;
             } catch (error) {
                 console.error('Error fetching log:', error);
                 logElement.textContent += '\n\n*** Error fetching log. Polling stopped. Check console. ***';

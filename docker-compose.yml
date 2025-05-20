@@ -2,6 +2,9 @@ include:
   - path: docker-compose.vllm.yaml
   - path: docker-compose.sglang.yaml
   - path: docker-compose.litellm.yaml
+  - path: docker-compose.nginx.yaml
+  - path: docker-compose.metrics.yaml  
+  - path: docker-compose.nginx.yaml
   - path: docker-compose.load-generator.yaml
 
 # Define a default service so "docker compose up -d" works without specifying services
@@ -9,6 +12,7 @@ services:
   default:
     image: busybox
     command: echo "Starting all services via dependencies"
+    container_name: ai-infra-summit
     network_mode: host
     depends_on:
       - proxy
@@ -18,4 +22,8 @@ services:
       - vllm-model12 # mistral-nemo group
       - vllm-model16 # bge-embeddings group
       - vllm-model20 # bge-reranker group
-      - sglang-00    # sglang group
+      - sglang-01 # sglang qwen3-4b group
+      - sglang-04 # sglang Llama-3.2-3B-Instruct group
+      - vllm-model32 # gemma-4 group
+      - vllm-model36 # meta-llama group
+      - vllm-model40 # c4ai-command-r7b-12-2024 group

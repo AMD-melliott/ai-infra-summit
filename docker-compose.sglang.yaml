@@ -1,97 +1,165 @@
-x-devices: &devices
+x-sglang-devices: &sglang-devices
     devices:
         - /dev/kfd
         - /dev/dri
     group_add:
         - video
-x-defaults: &defaults
+x-sglang-defaults: &sglang-defaults
     security_opt:
         - seccomp:unconfined
     ipc: "host"
-    shm_size: "128G"
+    shm_size: "8G"
     volumes:
-      - ${CACHE_PATH}:/root/.cache/huggingface
-    restart: on-failure      
+      - ${CACHE_PATH}:/root/.cache/huggingface   
     environment:
-      HF_HOME: /root/.cache/huggingface   
-      VLLM_USE_TRITON_FLASH_ATTN: 0
-      TRUST_REMOTE_CODE: "true"
-      VLLM_USE_V1: 0
-      VLLM_USE_AITER: 1
-      PYTORCH_HIP_ALLOC_CONF: expandable_segments:True      
+      HF_HOME: /root/.cache/huggingface
     env_file:
       - .env
 
 services:
-  sglang-00:
-    <<: [*defaults, *devices]
-    image: $SGLANG_IMAGE
-    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9000
-    network_mode: host
-    environment:
-      HIP_VISIBLE_DEVICES: "24,25"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 60s
-      start_interval: 30s
-    restart: on-failure
-
   sglang-01:
-    <<: [*defaults, *devices]
+    <<: [*sglang-defaults, *sglang-devices]
     image: $SGLANG_IMAGE
-    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9001
+    container_name: sglang-model1    
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-4B --trust-remote-code --reasoning-parser deepseek-r1 --port 9101
     network_mode: host
     environment:
-      HIP_VISIBLE_DEVICES: "26,27"
-    depends_on:
-      sglang-00:
-        condition: service_healthy      
+      HIP_VISIBLE_DEVICES: "24"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:9101/health"]
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 60s
-      start_interval: 30s
+      retries: 30
+      start_period: 90s
     restart: on-failure
 
   sglang-02:
-    <<: [*defaults, *devices]
+    <<: [*sglang-defaults, *sglang-devices]
     image: $SGLANG_IMAGE
-    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9002
+    container_name: sglang-model2
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-4B --trust-remote-code --reasoning-parser deepseek-r1 --port 9102
     network_mode: host
     environment:
-      HIP_VISIBLE_DEVICES: "28,29"
+      HIP_VISIBLE_DEVICES: "25"
     depends_on:
       sglang-01:
-        condition: service_healthy         
+        condition: service_healthy      
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:9102/health"]
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 60s
-      start_interval: 30s
+      retries: 30
+      start_period: 90s
     restart: on-failure
 
   sglang-03:
-    <<: [*defaults, *devices]
+    <<: [*sglang-defaults, *sglang-devices]
     image: $SGLANG_IMAGE
-    command: python3 -m sglang.launch_server --model Qwen/Qwen3-14B --tp 2 --trust-remote-code --reasoning-parser deepseek-r1 --mem-fraction-static 0.8 --chunked-prefill-size 256 --port 9003
+    container_name: sglang-model3
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-4B --trust-remote-code --reasoning-parser deepseek-r1 --port 9103
     network_mode: host
     environment:
-      HIP_VISIBLE_DEVICES: "30,31"
+      HIP_VISIBLE_DEVICES: "26"
     depends_on:
       sglang-02:
         condition: service_healthy         
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://localhost:9103/health"]
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 60s
-      start_interval: 30s
+      retries: 30
+      start_period: 90s
     restart: on-failure
+
+  sglang-04:
+    <<: [*sglang-defaults, *sglang-devices]
+    image: $SGLANG_IMAGE
+    container_name: sglang-model4
+    command: python3 -m sglang.launch_server --model Qwen/Qwen3-4B --reasoning-parser deepseek-r1 --trust-remote-code --port 9104
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "27"      
+    depends_on:
+      sglang-03:
+        condition: service_healthy 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9104/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    restart: on-failure
+
+  sglang-05:
+    <<: [*sglang-defaults, *sglang-devices]
+    image: $SGLANG_IMAGE
+    container_name: sglang-model5
+    command: python3 -m sglang.launch_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --port 9105
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "28"
+    depends_on:
+      sglang-04:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9105/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    restart: on-failure
+
+  sglang-06:
+    <<: [*sglang-defaults, *sglang-devices]
+    image: $SGLANG_IMAGE
+    container_name: sglang-model6
+    command: python3 -m sglang.launch_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --port 9106
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "29"
+    depends_on:
+      sglang-05:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9106/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    restart: on-failure
+
+  sglang-07:
+    <<: [*sglang-defaults, *sglang-devices]
+    image: $SGLANG_IMAGE
+    container_name: sglang-model7
+    command: python3 -m sglang.launch_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --port 9107
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "30"
+    depends_on:
+      sglang-06:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9107/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  sglang-08:
+    <<: [*sglang-defaults, *sglang-devices]
+    image: $SGLANG_IMAGE
+    container_name: sglang-model0   
+    command: python3 -m sglang.launch_server --model meta-llama/Llama-3.2-3B-Instruct --trust-remote-code --port 9108
+    network_mode: host
+    environment:
+      HIP_VISIBLE_DEVICES: "31"
+    depends_on:
+      sglang-07:
+        condition: service_healthy        
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9108/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+    restart: on-failure      
